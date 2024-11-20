@@ -1,6 +1,7 @@
-import { logout } from "./logout/actions";
+import { logout } from "./(routes)/logout/actions";
 import { createClient } from "../../utils/supabase/server";
 import { redirect } from "next/navigation";
+import './globals.css';
 
 export default async function Home() {
   const supabase = await createClient();

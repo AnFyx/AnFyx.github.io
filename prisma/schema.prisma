@@ -1,97 +1,97 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Profile {
-  id         Int       @id @default(autoincrement()) // Using Int for ID with auto-increment
-  email      String    @unique
-  avatar     String?
-  username   String?
-  name       String?
-  subtitle   String?
-  bio        String?
-
-  // Relations
-  posts      Post[]     // A profile can have many posts
-  comments   Comment[]  // A profile can have many comments
-  likes      Like[]     // A profile can like many posts
-  bookmarks  Bookmark[] // A profile can bookmark many posts
-  followers  Follower[] @relation("Followed")  // A profile can have many followers
-  following  Follower[] @relation("Following") // A profile can follow many profiles
+  id       Int      @id @default(autoincrement()) @map("_id")
+  email    String   @unique
+  avatar   String?
+  username String?
+  name     String?
+  subtitle String?
+  bio      String?
+  
+  following  Follower[] @relation("FollowingProfile")
+  followedBy Follower[] @relation("FollowedProfile")
 }
 
 model Post {
-  id            Int       @id @default(autoincrement()) // Int as the primary key with auto-increment
-  author        Int       // This should be a foreign key referring to Profile (Int for the ID)
-  image         String
-  description   String
-  likesCount    Int       @default(0)
-  dislikesCount Int       @default(0)
-  vtffCount     Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              Int   @id @default(autoincrement()) @map("_id")
+  author          Int
+  image           String
+  description     String
+  likesCount      Int      @default(0)
+  dislikesCount   Int      @default(0)
+  vtffCount       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  // Relations
-  authorProfile Profile     @relation(fields: [author], references: [id]) // Foreign key relation to Profile
-  comments      Comment[]   // A post can have many comments
-  likes         Like[]      // A post can have many likes
-  bookmarks     Bookmark[]  // A post can have many bookmarks
+  comments    Comment[]
+  likes       Like[]
+  dislikes    Dislike[]
+  vtffs       Vtff[]
+  bookmarks   Bookmark[]
 }
 
 model Comment {
-  id            Int       @id @default(autoincrement()) // Int for ID with auto-increment
-  postId        Int       // Foreign key referencing Post
-  author        Int       // Foreign key referencing Profile
-  text          String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        Int      @id @default(autoincrement()) @map("_id")
+  postId    Int
+  author    String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // Relations
-  post          Post      @relation(fields: [postId], references: [id]) // Foreign key relation to Post
-  authorProfile Profile   @relation(fields: [author], references: [id]) // Foreign key relation to Profile
+  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Like {
-  id            Int       @id @default(autoincrement()) // Int for ID with auto-increment
-  postId        Int       // Foreign key referencing Post
-  author        Int       // Foreign key referencing Profile
-  createdAt     DateTime  @default(now())
+  id        Int      @id @default(autoincrement()) @map("_id")
+  postId    Int
+  author    Int
+  createdAt DateTime @default(now())
 
-  // Relations
-  post          Post      @relation(fields: [postId], references: [id]) // Foreign key relation to Post
-  authorProfile Profile   @relation(fields: [author], references: [id]) // Foreign key relation to Profile
+  post      Post     @relation(fields: [postId], references: [id])
+}
+
+model Dislike {
+  id        Int      @id @default(autoincrement()) @map("_id")
+  postId    Int
+  author    Int
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id])
+}
+
+model Vtff {
+  id        Int      @id @default(autoincrement()) @map("_id")
+  postId    Int
+  author    Int
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Bookmark {
-  id            Int       @id @default(autoincrement()) // Int for ID with auto-increment
-  postId        Int       // Foreign key referencing Post
-  author        Int       // Foreign key referencing Profile
-  createdAt     DateTime  @default(now())
+  id        Int      @id @default(autoincrement()) @map("_id")
+  postId    Int
+  author    Int
+  createdAt DateTime @default(now())
 
-  // Relations
-  post          Post      @relation(fields: [postId], references: [id]) // Foreign key relation to Post
-  authorProfile Profile   @relation(fields: [author], references: [id]) // Foreign key relation to Profile
+  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Follower {
-  id                    Int      @id @default(autoincrement()) // Int for ID with auto-increment
-  followingProfileId    Int      // Foreign key referencing Profile (following profile)
-  followedProfileId     Int      // Foreign key referencing Profile (followed profile)
+  id                    Int      @id @default(autoincrement()) @map("_id")
+  followingProfileEmail String
+  followingProfileId    Int
+  followedProfileId     Int
   createdAt             DateTime @default(now())
 
-  // Relations
-  followingProfile      Profile  @relation("Following", fields: [followingProfileId], references: [id]) // Relation to Profile for following
-  followedProfile       Profile  @relation("Followed", fields: [followedProfileId], references: [id])   // Relation to Profile for followed
+  followingProfile      Profile  @relation("FollowingProfile", fields: [followingProfileId], references: [id])
+  followedProfile       Profile  @relation("FollowedProfile", fields: [followedProfileId], references: [id])
 }

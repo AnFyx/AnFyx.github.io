@@ -1,13 +1,12 @@
+import {getSessionEmailOrThrow} from "@/actions";
 import HomePosts from "@/components/HomePosts";
-import HomeTopRow from "@/components/HomeTopRow";
 import {prisma} from "@/db";
-import {auth} from "./../actions";
+import {Session} from "next-auth";
 
-export default async function UserHome() {
-  const session = await auth();
+export default async function UserHome({session}:{session:Session}) {
   const follows = await prisma.follower.findMany({
     where: {
-      followingProfileEmail: session?.email || '',
+      followingProfileEmail: session?.user?.email || '',
     },
   });
   const profiles = await prisma.profile.findMany({
@@ -17,7 +16,6 @@ export default async function UserHome() {
   });
   return (
     <div className="flex flex-col gap-8">
-      <HomeTopRow follows={follows} profiles={profiles}/>
       <HomePosts follows={follows} profiles={profiles} />
     </div>
   );

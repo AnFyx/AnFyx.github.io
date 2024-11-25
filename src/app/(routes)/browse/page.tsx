@@ -8,10 +8,6 @@ export default async function BrowsePage() {
   });
   return (
     <div>
-      {/*<div className="mb-4">*/}
-      {/*  <h1 className="text-4xl font-bold text-slate-900">Browse</h1>*/}
-      {/*  <p className="text-gray-500">Check trending posts and find some inspiration</p>*/}
-      {/*</div>*/}
       <PostsGrid posts={posts}/>
     </div>
   );

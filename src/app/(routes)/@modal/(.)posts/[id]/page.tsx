@@ -3,7 +3,14 @@ import ModalPostContent from "@/components/ModalPostContent";
 import Preloader from "@/components/Preloader";
 import {Suspense} from "react";
 
-export default async function PostInModal({params:{id}}:{params:{id:string}}) {
+type Props = {
+  params: {
+    id: string
+  }
+}
+
+export default async function PostInModal(props: Props) {
+  const { id } = await props.params;
   return (
     <Modal>
       <Suspense fallback={<Preloader />}>

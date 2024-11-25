@@ -21,11 +21,11 @@ export default function ProfilePageContent({
         isOurProfile={isOurProfile}
         ourFollow={ourFollow} />
       <ProfileNav
-        username={profile.username || 'image.png'}
+        username={profile.username || ''}
         isOurProfile={isOurProfile} />
       <section className="mt-4">
         <Suspense fallback={<Preloader />}>
-          <ProfilePosts id={profile.id}/>
+          <ProfilePosts email={profile.email}/>
         </Suspense>
       </section>
     </main>

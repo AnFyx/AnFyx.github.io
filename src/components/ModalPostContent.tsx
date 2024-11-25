@@ -5,7 +5,7 @@ export default async function ModalPostContent({postId}:{postId:string}) {
   const {
     post, authorProfile, comments,
     commentsAuthors, myLike, myBookmark,
-  } = await getSinglePostData(parseInt(postId, 10));
+  } = await getSinglePostData(postId);
   return (
     <SinglePostContent
       post={post}

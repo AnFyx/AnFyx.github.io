@@ -1,23 +1,25 @@
+import {auth} from "@/auth";
 import PostsGrid from "@/components/PostsGrid";
 import ProfileNav from "@/components/ProfileNav";
 import ProfilePageInfo from "@/components/ProfilePageInfo";
 import {prisma} from "@/db";
 import {redirect} from "next/navigation";
-import { createClient } from "../../../../../utils/supabase/server";
 
 export default async function BookmarkedPage() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getSession();
+  const session = await auth();
   const profile = await prisma.profile
-  .findFirst({where:{email:data?.session?.user?.email as string}});
+    .findFirst({where:{email:session?.user?.email as string}});
   if (!profile) {
     return redirect('/settings');
   }
   const bookmarks = await prisma.bookmark.findMany({
-    where: {author:Number(data?.session?.user?.id)},
+    where: {author:session?.user?.email as string},
   });
   const posts = await prisma.post.findMany({
-    where: {id: {in: bookmarks.map(b => b.postId)}},
+    where: {
+      id: {in: bookmarks.map(b => b.postId)}
+    },
+    orderBy: {createdAt: 'desc'}
   })
   return (
     <div>

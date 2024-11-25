@@ -1,20 +1,19 @@
 import Preloader from "@/components/Preloader";
 import SearchForm from "@/components/SearchForm";
 import SearchResults from "@/components/SearchResults";
-import { Suspense } from "react";
+import {Suspense} from "react";
 
 export default async function SearchPage({
   searchParams,
-}: {
-  searchParams: { query?: string }; // Adjusted type to reflect the actual shape
+}:{
+  searchParams: { query: string },
 }) {
-  const query = searchParams.query; // Directly access the query parameter
-
+  const { query } = await searchParams;
   return (
     <div className="w-full">
       <div className="max-w-md mx-auto">
         <SearchForm />
-        {query && (
+        {typeof query !== 'undefined' && (
           <Suspense fallback={<Preloader />}>
             <SearchResults query={query} />
           </Suspense>
@@ -23,4 +22,3 @@ export default async function SearchPage({
     </div>
   );
 }
-

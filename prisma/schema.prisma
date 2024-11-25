@@ -1,97 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model Profile {
-  id       Int      @id @default(autoincrement()) @map("_id")
-  email    String   @unique
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  email    String  @unique
+  role     String  @default("user")
   avatar   String?
   username String?
   name     String?
   subtitle String?
   bio      String?
-  
-  following  Follower[] @relation("FollowingProfile")
-  followedBy Follower[] @relation("FollowedProfile")
 }
 
 model Post {
-  id              Int   @id @default(autoincrement()) @map("_id")
-  author          Int
-  image           String
-  description     String
-  likesCount      Int      @default(0)
-  dislikesCount   Int      @default(0)
-  vtffCount       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  comments    Comment[]
-  likes       Like[]
-  dislikes    Dislike[]
-  vtffs       Vtff[]
-  bookmarks   Bookmark[]
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  approved      Boolean
+  author        String
+  image         String
+  description   String
+  likesCount    Int      @default(0)
+  dislikesCount Int      @default(0)
+  vtffsCount    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement()) @map("_id")
-  postId    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
   author    String
   text      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Like {
-  id        Int      @id @default(autoincrement()) @map("_id")
-  postId    Int
-  author    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  author    String
   createdAt DateTime @default(now())
-
-  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Dislike {
-  id        Int      @id @default(autoincrement()) @map("_id")
-  postId    Int
-  author    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  author    String
   createdAt DateTime @default(now())
-
-  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Vtff {
-  id        Int      @id @default(autoincrement()) @map("_id")
-  postId    Int
-  author    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  author    String
   createdAt DateTime @default(now())
-
-  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Bookmark {
-  id        Int      @id @default(autoincrement()) @map("_id")
-  postId    Int
-  author    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  author    String
   createdAt DateTime @default(now())
-
-  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Follower {
-  id                    Int      @id @default(autoincrement()) @map("_id")
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
   followingProfileEmail String
-  followingProfileId    Int
-  followedProfileId     Int
+  followingProfileId    String   @db.ObjectId
+  followedProfileId     String   @db.ObjectId
   createdAt             DateTime @default(now())
-
-  followingProfile      Profile  @relation("FollowingProfile", fields: [followingProfileId], references: [id])
-  followedProfile       Profile  @relation("FollowedProfile", fields: [followedProfileId], references: [id])
 }

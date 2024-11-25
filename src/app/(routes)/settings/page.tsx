@@ -1,13 +1,10 @@
+import {auth, signOut} from "@/auth";
 import SettingsForm from "@/components/SettingsForm";
 import {prisma} from "@/db";
 import {Button} from "@radix-ui/themes";
-import { createClient } from "../../../../utils/supabase/server";
-import { logout } from "./../../(routes)/logout/actions";
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getSession();
-  const session = data?.session;
+  const session = await auth();
   if (!session?.user?.email) {
     return 'not logged in';
   }
@@ -28,7 +25,7 @@ export default async function SettingsPage() {
       <div className="flex justify-center mt-4 pt-4 border-t border-gray-300">
         <form action={async () => {
           'use server';
-          await logout();
+          await signOut();
         }}>
           <Button type="submit" variant="outline">
             Logout

@@ -1,20 +1,24 @@
 'use client';
-import {updateProfile} from "@/actions";
-import {Profile} from "@prisma/client";
-import {Button, Switch, TextArea, TextField} from "@radix-ui/themes";
-import {CloudUploadIcon} from "lucide-react";
-import {useRouter} from "next/navigation";
-import {useEffect, useRef, useState} from "react";
+
+import { updateProfile } from "@/actions";
+import { Profile } from "@prisma/client";
+import { Button, Switch, TextArea, TextField } from "@radix-ui/themes";
+import { CloudUploadIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 export default function SettingsForm({
   profile,
-}:{
-  profile:Profile|null;
+}: {
+  profile: Profile | null;
 }) {
   const router = useRouter();
   const fileInRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File|null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar || null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Handle file upload and avatar preview
   useEffect(() => {
     if (file) {
       const data = new FormData();
@@ -22,74 +26,101 @@ export default function SettingsForm({
       fetch("/api/upload", {
         method: "POST",
         body: data,
-      }).then(response => {
-        response.json().then(url => {
-          setAvatarUrl(url);
-        });
-      });
+      })
+        .then((response) => response.json())
+        .then((url) => setAvatarUrl(url))
+        .catch((error) => console.error("Upload error:", error));
     }
   }, [file]);
+
+  // Initialize dark mode state
+  useEffect(() => {
+    const theme = window.localStorage.getItem("theme") || "light";
+    setIsDarkMode(theme === "dark");
+  }, []);
+
+  const handleThemeChange = (isDark: boolean) => {
+    const html = document.querySelector("html");
+    const theme = isDark ? "dark" : "light";
+    if (html) {
+      html.dataset.theme = theme;
+    }
+    localStorage.setItem("theme", theme);
+    setIsDarkMode(isDark);
+    window.location.reload();
+  };
+
   return (
-    <form action={async (data: FormData) => {
-      await updateProfile(data);
-      router.push('/profile');
-      router.refresh();
-    }}>
-      <input type="hidden" name="avatar" value={avatarUrl || ''}/>
+    <form
+      action={async (data: FormData) => {
+        await updateProfile(data);
+        router.push("/profile");
+        router.refresh();
+      }}
+    >
+      {/* Avatar Section */}
+      <input type="hidden" name="avatar" value={avatarUrl || ""} />
       <div className="flex gap-4 items-center">
         <div>
           <div className="bg-gray-400 size-24 rounded-full overflow-hidden aspect-square shadow-md shadow-gray-400">
-            <img className="" src={avatarUrl || ''} alt=""/>
+            <img
+              className="object-cover w-full h-full"
+              src={avatarUrl || "/default-avatar.png"}
+              alt="User Avatar"
+            />
           </div>
         </div>
         <div>
-          <input type="file"
-                 ref={fileInRef}
-                 className="hidden"
-                 onChange={ev => setFile(ev.target.files?.[0] || null)}
+          <input
+            type="file"
+            ref={fileInRef}
+            className="hidden"
+            onChange={(ev) => setFile(ev.target.files?.[0] || null)}
           />
           <Button
             type="button"
             variant="surface"
             onClick={() => fileInRef.current?.click()}
           >
-            <CloudUploadIcon/>
+            <CloudUploadIcon />
             Change avatar
           </Button>
         </div>
       </div>
-      <p className="mt-2 font-bold">username</p>
+
+      {/* User Info Fields */}
+      <p className="mt-2 font-bold">Username</p>
       <TextField.Root
         name="username"
-        defaultValue={profile?.username || ''}
-        placeholder="your_username"/>
-      <p className="mt-2 font-bold">name</p>
+        defaultValue={profile?.username || ""}
+        placeholder="your_username"
+      />
+      <p className="mt-2 font-bold">Name</p>
       <TextField.Root
         name="name"
-        defaultValue={profile?.name || ''}
-        placeholder="John Doe"/>
-      <p className="mt-2 font-bold">subtitle</p>
+        defaultValue={profile?.name || ""}
+        placeholder="John Doe"
+      />
+      <p className="mt-2 font-bold">Subtitle</p>
       <TextField.Root
         name="subtitle"
-        defaultValue={profile?.subtitle || ''}
-        placeholder="Graphic designer"/>
-      <p className="mt-2 font-bold">bio</p>
-      <TextArea name="bio" defaultValue={profile?.bio || ''} />
-      <label className="flex gap-2 items-center mt-2">
-        <span>Dark mode </span>
+        defaultValue={profile?.subtitle || ""}
+        placeholder="Graphic Designer"
+      />
+      <p className="mt-2 font-bold">Bio</p>
+      <TextArea name="bio" defaultValue={profile?.bio || ""} />
+
+      {/* Dark Mode Toggle */}
+      <label className="flex gap-2 items-center mt-4">
+        <span>Dark mode</span>
         <Switch
-          defaultChecked={localStorage.getItem('theme') == 'dark'}
-          onCheckedChange={(isDark) => {
-            const html = document.querySelector('html');
-            const theme = isDark ? 'dark' : 'light';
-            if (html) {
-              html.dataset.theme = theme;
-            }
-            localStorage.setItem('theme', theme);
-            window.location.reload();
-        }} />
+          checked={isDarkMode}
+          onCheckedChange={handleThemeChange}
+        />
       </label>
-      <div className="mt-4 flex justify-center">
+
+      {/* Save Button */}
+      <div className="mt-6 flex justify-center">
         <Button variant="solid">Save settings</Button>
       </div>
     </form>

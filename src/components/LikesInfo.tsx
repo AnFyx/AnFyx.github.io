@@ -1,7 +1,7 @@
 'use client';
 import {likePost, removeLikeFromPost} from "@/actions";
 import {Like, Post} from "@prisma/client";
-import {HeartIcon} from "lucide-react";
+import {ThumbsUp} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 
@@ -34,7 +34,7 @@ export default function LikesInfo({
       <button
         type="submit"
         className="">
-        <HeartIcon className={likedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
+        <ThumbsUp className={likedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
       </button>
       {showText && (
         <p>{post.likesCount} people like this</p>

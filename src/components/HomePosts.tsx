@@ -16,7 +16,7 @@ export default async function HomePosts({
 }) {
   const posts = await prisma.post.findMany({
     where: {
-      author: {in: profiles.map(p => Number(p.email))},
+      author: {in: profiles.map(p => p.email)},
     },
     orderBy: {
       createdAt: 'desc',
@@ -25,13 +25,13 @@ export default async function HomePosts({
   });
   const likes = await prisma.like.findMany({
     where: {
-      author: Number(await getSessionEmailOrThrow()),
+      author: await getSessionEmailOrThrow(),
       postId: {in: posts.map(p => p.id)},
     },
   });
   const bookmarks = await prisma.bookmark.findMany({
     where: {
-      author: Number(await getSessionEmailOrThrow()),
+      author: await getSessionEmailOrThrow(),
       postId: {in: posts.map(p => p.id)},
     },
   });
@@ -39,7 +39,7 @@ export default async function HomePosts({
     <div
       className="max-w-md mx-auto flex flex-col gap-12">
       {posts.map(post => {
-        const profile = profiles.find(p => p.email === String(post.author));
+        const profile = profiles.find(p => p.email === post.author);
         return (
           <div
             key={post.id}

@@ -1,4 +1,4 @@
-import {CameraIcon, HomeIcon, LayoutGridIcon, SearchIcon, UserIcon} from "lucide-react";
+import {CameraIcon, LogOutIcon, HomeIcon, LayoutGridIcon, SearchIcon, UserIcon} from "lucide-react";
 import Link from "next/link";
 
 export default function DesktopNav() {
@@ -28,6 +28,10 @@ export default function DesktopNav() {
           <Link href={'/create'}>
             <CameraIcon/>
             Create
+          </Link>
+          <Link href={'/logout'}>
+            <LogOutIcon/>
+            Logout
           </Link>
         </div>
       </div>

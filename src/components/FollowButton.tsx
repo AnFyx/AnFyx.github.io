@@ -10,7 +10,7 @@ export default function FollowButton({
   profileIdToFollow,
   ourFollow=null,
 }:{
-  profileIdToFollow:number;
+  profileIdToFollow:string;
   ourFollow:Follower|null;
 }) {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function FollowButton({
       setIsFollowed(prev => !prev);
       if (isFollowed) {
         // unfollow
-        await unfollowProfile(Number(profileIdToFollow));
+        await unfollowProfile(profileIdToFollow);
       } else {
         // follow
         await followProfile(profileIdToFollow)

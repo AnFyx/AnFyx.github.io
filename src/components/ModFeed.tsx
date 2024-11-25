@@ -4,7 +4,7 @@ import Link from "next/link";
 import Masonry from 'react-masonry-css';
 
 export default function PostsGrid({ posts }: { posts: Post[] }) {
-  const approvedPosts = posts.filter(post => post.approved);
+  const approvedPosts = posts.filter(post => !post.approved);
   return (
     <div className="max-w-4xl mx-auto">
       <Masonry

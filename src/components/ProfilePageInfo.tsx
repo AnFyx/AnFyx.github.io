@@ -38,7 +38,7 @@ export default function ProfilePageInfo({
             <div className="size-40 aspect-square overflow-hidden rounded-full">
               <img
                 className=""
-                src={profile.avatar || ''}
+                src={profile.avatar || './default_avatar.jpg'}
                 alt=""/>
             </div>
           </div>

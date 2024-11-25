@@ -1,5 +1,7 @@
 import {getSinglePostData} from "@/actions";
 import SinglePostContent from "@/components/SinglePostContent";
+import {auth} from "@/auth";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: {
@@ -8,10 +10,15 @@ type Props = {
 }
 
 export default async function SinglePostPage(props: Props) {
+  const session = await auth();
+  if (!session) {
+    return redirect('/login');
+  }
   const { id } = await props.params;
   const {
     post, authorProfile, comments,
-    commentsAuthors, myLike, myBookmark,
+    commentsAuthors, myLike, myDislike, 
+    myVtff, myBookmark,
   } = await getSinglePostData(id);
   return (
     <SinglePostContent
@@ -20,6 +27,8 @@ export default async function SinglePostPage(props: Props) {
       comments={comments}
       commentsAuthors={commentsAuthors}
       myLike={myLike}
+      myDislike={myDislike}
+      myVtff={myVtff}
       myBookmark={myBookmark}
     />
   );

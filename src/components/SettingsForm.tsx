@@ -65,7 +65,7 @@ export default function SettingsForm({
           <div className="bg-gray-400 size-24 rounded-full overflow-hidden aspect-square shadow-md shadow-gray-400">
             <img
               className="object-cover w-full h-full"
-              src={avatarUrl || "/default-avatar.png"}
+              src={avatarUrl || "./default_avatar.jpg"}
               alt="User Avatar"
             />
           </div>

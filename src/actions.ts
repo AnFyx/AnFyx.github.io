@@ -25,7 +25,11 @@ export async function updateProfile(data: FormData) {
     subtitle: data.get('subtitle') as string,
     bio: data.get('bio') as string,
     avatar: data.get('avatar') as string,
+    role: 'user',
   };
+  if (newUserInfo.avatar === '') {
+    newUserInfo.avatar = "https://harlequin-keen-chickadee-753.mypinata.cloud/files/bafkreifznv3isngocvxcddhmtercz7qbs5vvu5adrdgvqjucl36ipfyh3m";
+  }
   await prisma.profile.upsert({
     where: {
       email: userEmail,
@@ -45,6 +49,7 @@ export async function postEntry(data: FormData) {
       author: sessionEmail,
       image: data.get('image') as string,
       description: data.get('description') as string || '',
+      approved: false,
     },
   });
   return postDoc.id;
@@ -170,6 +175,18 @@ export async function getSinglePostData(postId:string) {
       postId: post.id,
     }
   });
+  const myDislike = await prisma.dislike.findFirst({
+    where: {
+      author: sessionEmail,
+      postId: post.id,
+    }
+  });
+  const myVtff = await prisma.vtff.findFirst({
+    where: {
+      author: sessionEmail,
+      postId: post.id,
+    }
+  });
   const myBookmark = await prisma.bookmark.findFirst({
     where: {
       author: sessionEmail,
@@ -178,7 +195,8 @@ export async function getSinglePostData(postId:string) {
   });
   return {
     post, authorProfile, comments,
-    commentsAuthors, myLike, myBookmark,
+    commentsAuthors, myLike, myDislike, 
+    myVtff, myBookmark,
   };
 }
 

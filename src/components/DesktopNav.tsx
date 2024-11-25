@@ -1,5 +1,7 @@
 import {CameraIcon, LogOutIcon, HomeIcon, LayoutGridIcon, SearchIcon, UserIcon} from "lucide-react";
 import Link from "next/link";
+import {signOut} from "@/auth";
+import { redirect } from "next/navigation";
 
 export default function DesktopNav() {
   return (
@@ -29,10 +31,18 @@ export default function DesktopNav() {
             <CameraIcon/>
             Create
           </Link>
-          <Link href={'/logout'}>
-            <LogOutIcon/>
-            Logout
-          </Link>
+          <form action={async () => {
+              'use server';
+              await signOut();
+            }}>
+            <button
+              type="submit"
+              className="flex items-center "
+            >
+              <LogOutIcon className="mr-2" />
+                Logout
+            </button>
+          </form>
         </div>
       </div>
     </div>

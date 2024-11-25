@@ -17,7 +17,7 @@ model Profile {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   email    String  @unique
   role     String  @default("user")
-  avatar   String?
+  avatar   String  @default("https://harlequin-keen-chickadee-753.mypinata.cloud/files/bafkreifznv3isngocvxcddhmtercz7qbs5vvu5adrdgvqjucl36ipfyh3m")
   username String?
   name     String?
   subtitle String?
@@ -26,7 +26,7 @@ model Profile {
 
 model Post {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  approved      Boolean
+  approved      Boolean  @default(false)
   author        String
   image         String
   description   String

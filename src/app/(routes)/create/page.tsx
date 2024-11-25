@@ -2,16 +2,21 @@
 import {postEntry} from "@/actions";
 import {Button, TextArea} from "@radix-ui/themes";
 import {CloudUploadIcon, SendIcon} from "lucide-react";
-import {useRouter} from "next/navigation";
-import {useEffect, useRef, useState} from "react";
+import {redirect, useRouter} from "next/navigation";
+import {useLayoutEffect, useRef, useState} from "react";
+import { useSession } from "next-auth/react";
 
 export default function CreatePage() {
+  const { data: session } = useSession();
   const [imageUrl, setImageUrl] = useState('');
   const [file, setFile] = useState<File|null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (!session) {
+      return redirect('/login');
+    }
     if (file) {
       setIsUploading(true);
       const data = new FormData();

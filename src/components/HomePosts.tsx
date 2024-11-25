@@ -1,6 +1,8 @@
 import {getSessionEmailOrThrow} from "@/actions";
 import BookmarkButton from "@/components/BookmarkButton";
 import LikesInfo from "@/components/LikesInfo";
+import DislikesInfo from "@/components/DislikesInfo";
+import VtffInfo from "@/components/VtffInfo";
 import {prisma} from "@/db";
 import {Follower, Profile} from "@prisma/client";
 import {Avatar} from "@radix-ui/themes";
@@ -24,6 +26,18 @@ export default async function HomePosts({
     take: 100,
   });
   const likes = await prisma.like.findMany({
+    where: {
+      author: await getSessionEmailOrThrow(),
+      postId: {in: posts.map(p => p.id)},
+    },
+  });
+  const dislikes = await prisma.dislike.findMany({
+    where: {
+      author: await getSessionEmailOrThrow(),
+      postId: {in: posts.map(p => p.id)},
+    },
+  });
+  const vtffs = await prisma.vtff.findMany({
     where: {
       author: await getSessionEmailOrThrow(),
       postId: {in: posts.map(p => p.id)},
@@ -68,6 +82,16 @@ export default async function HomePosts({
                   post={post}
                   showText={false}
                   sessionLike={likes.find(like => like.postId === post.id) || null}
+                />
+                <DislikesInfo
+                  post={post}
+                  showText={false}
+                  sessionDislike={dislikes.find(dislike => dislike.postId === post.id) || null}
+                />
+                <VtffInfo
+                  post={post}
+                  showText={false}
+                  sessionVtff={vtffs.find(vtff => vtff.postId === post.id) || null}
                 />
                 <BookmarkButton
                   post={post}

@@ -1,6 +1,8 @@
 import {getSessionEmail} from "@/actions";
 import ProfilePageContent from "@/components/ProfilePageContent";
 import {prisma} from "@/db";
+import {auth} from "@/auth";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: {
@@ -9,6 +11,10 @@ type Props = {
 }
 
 export default async function UserProfilePage(props: Props) {
+  const session = await auth();
+  if (!session) {
+    return redirect('/login');
+  }
   const { username } = await props.params;
   const sessionEmail = await getSessionEmail() || '';
   const profile = await prisma.profile.findFirstOrThrow({

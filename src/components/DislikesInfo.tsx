@@ -37,7 +37,7 @@ export default function DislikesInfo({
         <ThumbsDown className={dislikedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
       </button>
       {showText && (
-        <p>{post.dislikesCount} people dislike this</p>
+        <p>{post.dislikesCount}</p>
       )}
     </form>
   );

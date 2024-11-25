@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "../globals.css";
 import "@radix-ui/themes/styles.css";
-
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -35,6 +35,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-black dark:text-red-500`}>
+        <SessionProvider>
         <Theme>
           {modal}
           <div className="flex min-h-screen dark:bg-gray-800 dark:text-gray-300">
@@ -48,6 +49,7 @@ export default function RootLayout({
           <MobileNav />
         </Theme>
         <ThemeObserver />
+        </SessionProvider>
       </body>
     </html>
   );

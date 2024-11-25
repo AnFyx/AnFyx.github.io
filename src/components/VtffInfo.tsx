@@ -37,7 +37,7 @@ export default function VtffInfo({
         <IconHandMiddleFinger className={vtffedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
       </button>
       {showText && (
-        <p>{post.vtffsCount} people vtff this</p>
+        <p>{post.vtffsCount}</p>
       )}
     </form>
   );

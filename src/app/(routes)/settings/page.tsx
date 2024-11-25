@@ -2,9 +2,13 @@ import {auth, signOut} from "@/auth";
 import SettingsForm from "@/components/SettingsForm";
 import {prisma} from "@/db";
 import {Button} from "@radix-ui/themes";
+import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
   const session = await auth();
+  if (!session) {
+    return redirect('/login');
+  }
   if (!session?.user?.email) {
     return 'not logged in';
   }

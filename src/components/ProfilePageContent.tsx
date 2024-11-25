@@ -21,7 +21,7 @@ export default function ProfilePageContent({
         isOurProfile={isOurProfile}
         ourFollow={ourFollow} />
       <ProfileNav
-        username={profile.username || ''}
+        username={profile.username || 'username'}
         isOurProfile={isOurProfile} />
       <section className="mt-4">
         <Suspense fallback={<Preloader />}>

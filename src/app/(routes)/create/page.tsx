@@ -3,7 +3,7 @@ import {postEntry} from "@/actions";
 import {Button, TextArea} from "@radix-ui/themes";
 import {CloudUploadIcon, SendIcon} from "lucide-react";
 import {redirect, useRouter} from "next/navigation";
-import {useLayoutEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import { useSession } from "next-auth/react";
 
 export default function CreatePage() {
@@ -13,7 +13,7 @@ export default function CreatePage() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!session) {
       return redirect('/login');
     }

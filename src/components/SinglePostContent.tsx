@@ -6,7 +6,6 @@ import VtffsInfo from "@/components/VtffInfo";
 import Preloader from "@/components/Preloader";
 import SessionCommentForm from "@/components/SessionCommentForm";
 import {Post, Profile, Comment as CommentModel, Like, Dislike, Vtff, Bookmark} from "@prisma/client";
-import {BookmarkIcon} from "lucide-react";
 import {Suspense} from "react";
 
 export default function SinglePostContent({

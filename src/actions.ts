@@ -3,6 +3,26 @@
 import {auth} from "@/auth";
 import {prisma} from "@/db";
 import {uniq} from "lodash";
+import * as leoProfanity from "leo-profanity";
+import frenchBadWords from "french-badwords-list";
+import { v4 as uuidv4 } from "uuid";
+
+leoProfanity.loadDictionary("fr");
+leoProfanity.add(frenchBadWords.array);
+
+const maskProfanity = (text: string): string => {
+  const profaneWords = leoProfanity.list();
+  let maskedText = text;
+  profaneWords.forEach((word) => {
+    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+    maskedText = maskedText.replace(regex, '*'.repeat(word.length));
+  });
+  return maskedText;
+};
+
+interface FormData {
+  get(name: string): string | FormDataEntryValue | null;
+}
 
 export async function getSessionEmail(): Promise<string|null|undefined> {
   const session = await auth();
@@ -19,11 +39,27 @@ export async function getSessionEmailOrThrow(): Promise<string> {
 
 export async function updateProfile(data: FormData) {
   const userEmail = await getSessionEmailOrThrow();
+  let usernameText = data.get('username') as string;
+  if (leoProfanity.check(usernameText)) {
+    usernameText = 'user' + uuidv4().split('-')[0];
+  }
+  let nameText = data.get('name') as string;
+  if (leoProfanity.check(nameText)) {
+    nameText = usernameText;
+  }
+  let subtitleText = data.get('subtitle') as string;
+  if (leoProfanity.check(subtitleText)) {
+    subtitleText = maskProfanity(subtitleText);
+  }
+  let bioText = data.get('bio') as string;
+  if (leoProfanity.check(bioText)) {
+    bioText = maskProfanity(bioText);
+  }
   const newUserInfo = {
-    username: data.get('username') as string,
-    name: data.get('name') as string,
-    subtitle: data.get('subtitle') as string,
-    bio: data.get('bio') as string,
+    username: usernameText,
+    name: nameText,
+    subtitle: subtitleText,
+    bio: bioText,
     avatar: data.get('avatar') as string,
     role: 'user',
   };
@@ -44,11 +80,15 @@ export async function updateProfile(data: FormData) {
 
 export async function postEntry(data: FormData) {
   const sessionEmail = await getSessionEmailOrThrow();
+  let descriptionText = data.get('description') as string || '';
+  if (leoProfanity.check(descriptionText)) {
+    descriptionText = maskProfanity(descriptionText);
+  }
   const postDoc = await prisma.post.create({
     data: {
       author: sessionEmail,
       image: data.get('image') as string,
-      description: data.get('description') as string || '',
+      description: descriptionText,
       approved: false,
     },
   });
@@ -57,13 +97,17 @@ export async function postEntry(data: FormData) {
 
 export async function postComment(data: FormData) {
   const authorEmail = await getSessionEmailOrThrow();
+  let commentText = data.get("text") as string;
+  if (leoProfanity.check(commentText)) {
+    commentText = maskProfanity(commentText);
+  }
   return prisma.comment.create({
     data: {
       author: authorEmail,
-      postId: data.get('postId') as string,
-      text: data.get('text') as string,
+      postId: data.get("postId") as string,
+      text: commentText,
     },
-  })
+  });
 }
 
 async function updatePostLikesCount(postId: string) {
@@ -242,5 +286,66 @@ export async function unbookmarkPost(postId:string) {
       author: sessionEmail,
       postId,
     },
+  });
+}
+
+export async function deleteComment(commentId: string) {
+  const sessionEmail = await getSessionEmailOrThrow();
+  await prisma.comment.delete({
+    where: { 
+      author: sessionEmail,
+      id: commentId 
+    },
+  });
+}
+
+export async function deletePost(postId: string) {
+  await prisma.like.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.dislike.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.vtff.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.bookmark.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.comment.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.post.delete({
+    where: { id: postId },
+  });
+}
+
+export async function deleteProfile() {
+  const sessionEmail = await getSessionEmailOrThrow();
+  const userPosts = await prisma.post.findMany({
+    where: { author: sessionEmail },
+  });
+  const deletePromises = userPosts.map(post => deletePost(post.id));
+  await Promise.all(deletePromises); 
+  await prisma.like.deleteMany({
+    where: { author: sessionEmail },
+  });
+  await prisma.dislike.deleteMany({
+    where: { author: sessionEmail },
+  });
+  await prisma.vtff.deleteMany({
+    where: { author: sessionEmail },
+  });
+  await prisma.bookmark.deleteMany({
+    where: { author: sessionEmail },
+  });
+  await prisma.comment.deleteMany({
+    where: { author: sessionEmail },
+  });
+  await prisma.follower.deleteMany({
+    where: { followingProfileEmail: sessionEmail},
+  });
+  await prisma.profile.delete({
+    where: { email: sessionEmail },
   });
 }

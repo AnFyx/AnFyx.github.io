@@ -3,8 +3,7 @@ import {Post} from "@prisma/client";
 import Link from "next/link";
 import Masonry from 'react-masonry-css';
 
-export default function PostsGrid({ posts }: { posts: Post[] }) {
-  const approvedPosts = posts.filter(post => post.approved);
+export default function PostsGrid({ posts } : { posts: Post[] }) {
   return (
     <div className="max-w-4xl mx-auto">
       <Masonry
@@ -15,7 +14,7 @@ export default function PostsGrid({ posts }: { posts: Post[] }) {
         }}
         className="flex -ml-4"
         columnClassName="pl-4">
-        {approvedPosts.map(post => (
+        {posts.map(post => (
           <Link
             key={post.id}
             href={`/posts/${post.id}`} className="block mb-4">

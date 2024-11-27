@@ -16,6 +16,7 @@ export default async function SearchResults({query}:{query:string}) {
   const posts = await prisma.post.findMany({
     where: {
       description: {contains: query},
+      approved: true,
     },
     take: 100,
   });

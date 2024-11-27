@@ -1,54 +1,90 @@
-import {getSessionEmailOrThrow} from "@/actions";
+import {getSessionEmailOrThrow, getSessionRole} from "@/actions";
 import BookmarkButton from "@/components/BookmarkButton";
 import LikesInfo from "@/components/LikesInfo";
 import DislikesInfo from "@/components/DislikesInfo";
 import VtffInfo from "@/components/VtffInfo";
 import {prisma} from "@/db";
-import {Follower, Profile} from "@prisma/client";
+import {Bookmark, Dislike, Like, Profile, Vtff} from "@prisma/client";
 import {Avatar} from "@radix-ui/themes";
-import {BookmarkIcon} from "lucide-react";
 import Link from "next/link";
 
 export default async function HomePosts({
-  follows,
   profiles,
 }:{
-  follows: Follower[],
   profiles: Profile[],
 }) {
+  if (await getSessionRole() === 'admin') {
+
+    return (
+      <div>
+        {profiles?.length > 0 && (
+          <div className="grid mt-4 sm:grid-cols-1 gap-2">
+            {profiles.map(profile => (
+              <Link
+                key={profile.id}
+                href={`/users/${profile.username}`}
+                className="flex gap-2 bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-2 rounded-full">
+                <div className="">
+                  <Avatar
+                    size="4"
+                    radius="full"
+                    fallback="user avatar"
+                    src={profile.avatar || ''}/>
+                </div>
+                <div>
+                  <h3>{profile.name}</h3>
+                  <h4 className="text-gray-500 dark:text-gray-300 text-sm">
+                    @{profile.username}
+                  </h4>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+  const mod = await getSessionRole() === 'mod';
   const posts = await prisma.post.findMany({
     where: {
       author: {in: profiles.map(p => p.email)},
+      approved: mod ? false : true,
     },
     orderBy: {
-      createdAt: 'desc',
+      createdAt: mod ? 'asc' : 'desc',
     },
     take: 100,
   });
-  const likes = await prisma.like.findMany({
-    where: {
-      author: await getSessionEmailOrThrow(),
-      postId: {in: posts.map(p => p.id)},
-    },
-  });
-  const dislikes = await prisma.dislike.findMany({
-    where: {
-      author: await getSessionEmailOrThrow(),
-      postId: {in: posts.map(p => p.id)},
-    },
-  });
-  const vtffs = await prisma.vtff.findMany({
-    where: {
-      author: await getSessionEmailOrThrow(),
-      postId: {in: posts.map(p => p.id)},
-    },
-  });
-  const bookmarks = await prisma.bookmark.findMany({
-    where: {
-      author: await getSessionEmailOrThrow(),
-      postId: {in: posts.map(p => p.id)},
-    },
-  });
+  let likes: Like[] = [];
+  let dislikes: Dislike[] = [];
+  let vtffs: Vtff[] = [];
+  let bookmarks: Bookmark[] = [];
+  if (!mod) {
+    likes = await prisma.like.findMany({
+      where: {
+        author: await getSessionEmailOrThrow(),
+        postId: {in: posts.map(p => p.id)},
+      },
+    });
+    dislikes = await prisma.dislike.findMany({
+      where: {
+        author: await getSessionEmailOrThrow(),
+        postId: {in: posts.map(p => p.id)},
+      },
+    });
+    vtffs = await prisma.vtff.findMany({
+      where: {
+        author: await getSessionEmailOrThrow(),
+        postId: {in: posts.map(p => p.id)},
+      },
+    });
+    bookmarks = await prisma.bookmark.findMany({
+      where: {
+        author: await getSessionEmailOrThrow(),
+        postId: {in: posts.map(p => p.id)},
+      },
+    });
+  }
   return (
     <div
       className="max-w-md mx-auto flex flex-col gap-12">
@@ -77,7 +113,8 @@ export default async function HomePosts({
                   {profile?.name}
                 </Link>
               </div>
-              <div className="flex gap-2 items-center">
+              {!mod && (
+                <div className="flex gap-2 items-center">
                 <LikesInfo
                   post={post}
                   showText={false}
@@ -96,7 +133,7 @@ export default async function HomePosts({
                 <BookmarkButton
                   post={post}
                   sessionBookmark={bookmarks.find(b => b.postId === post.id) || null} />
-              </div>
+              </div>)}
             </div>
             <p className="mt-2 text-slate-600 dark:text-gray-400">
               {post.description}

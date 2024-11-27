@@ -1,9 +1,11 @@
 import {CameraIcon, LogOutIcon, HomeIcon, LayoutGridIcon, SearchIcon, UserIcon} from "lucide-react";
 import Link from "next/link";
 import {signOut} from "@/auth";
+import { getSessionRole } from "@/actions";
 import { redirect } from "next/navigation";
 
-export default function DesktopNav() {
+export default async function DesktopNav() {
+  const user = !['mod', 'admin'].includes(await getSessionRole());
   return (
     <div className="hidden md:block px-4 pb-4 w-48 shadow-md shadow-gray-400 dark:shadow-gray-600">
       <div className="top-4 sticky">
@@ -15,25 +17,30 @@ export default function DesktopNav() {
             <HomeIcon/>
             Home
           </Link>
-          <Link href={'/search'}>
-            <SearchIcon/>
-            Search
-          </Link>
-          <Link href={'/browse'}>
-            <LayoutGridIcon/>
-            Browse
-          </Link>
+          {user && (
+            <>
+              <Link href={'/search'}>
+                <SearchIcon />
+                Search
+              </Link>
+              <Link href={'/browse'}>
+                <LayoutGridIcon />
+                Browse
+              </Link>
+              <Link href={'/create'}>
+                <CameraIcon />
+                Create
+              </Link>
+            </>
+          )}
           <Link href={'/profile'}>
             <UserIcon/>
             Profile
           </Link>
-          <Link href={'/create'}>
-            <CameraIcon/>
-            Create
-          </Link>
           <form action={async () => {
               'use server';
               await signOut();
+              redirect('/login');
             }}>
             <button
               type="submit"

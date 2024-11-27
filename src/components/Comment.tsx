@@ -1,16 +1,23 @@
 import Avatar from "@/components/Avatar";
 import {Profile} from "@prisma/client";
 import {format} from 'date-fns';
+import { IconTrash } from '@tabler/icons-react';
+import { deleteComment, getSessionEmail } from "@/actions";
+import { redirect } from "next/navigation";
 
-export default function Comment ({
+export default async function Comment ({
   text,
   createdAt,
   authorProfile,
+  commentId,
 }:{
   text: string;
   createdAt: Date;
   authorProfile?: Profile;
+  commentId: string;
 }) {
+  const currentUserEmail = await getSessionEmail();
+  const isOwner = currentUserEmail === authorProfile?.email;
   return (
     <div className="flex gap-2">
       <div>
@@ -26,6 +33,19 @@ export default function Comment ({
               @{authorProfile?.username}
             </h4>
           </div>
+          {isOwner && ( // Conditionally render the delete button if the user is the owner
+            <form
+              action={async () => {
+                "use server";
+                await deleteComment(commentId);
+                redirect("/");
+              }}
+            >
+              <button type="submit" className="flex items-center">
+                <IconTrash />
+              </button>
+            </form>
+          )}
         </div>
         <div>
           <div className="bg-gray-200 dark:bg-gray-700 border dark:border-0 dark:text-gray-400 border-gray-300 rounded-md p-4 mt-2">

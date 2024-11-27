@@ -37,6 +37,16 @@ export async function getSessionEmailOrThrow(): Promise<string> {
   return userEmail;
 }
 
+export async function getSessionRole(): Promise<string> {
+  const userEmail = await getSessionEmailOrThrow();
+  const profile = await prisma.profile.findUnique({
+    where: {
+      email: userEmail,
+    },
+  });
+  return profile?.role || 'user';
+}
+
 export async function updateProfile(data: FormData) {
   const userEmail = await getSessionEmailOrThrow();
   let usernameText = data.get('username') as string;

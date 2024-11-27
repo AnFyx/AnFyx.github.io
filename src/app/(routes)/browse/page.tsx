@@ -9,6 +9,7 @@ export default async function BrowsePage() {
     return redirect('/login');
   }
   const posts = await prisma.post.findMany({
+    where: {approved: true},
     orderBy: {createdAt: 'desc'},
     take: 100,
   });

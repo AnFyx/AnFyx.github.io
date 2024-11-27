@@ -1,7 +1,7 @@
 'use client';
 import {postEntry} from "@/actions";
 import {Button, TextArea} from "@radix-ui/themes";
-import {CloudUploadIcon, SendIcon} from "lucide-react";
+import { IconCloudUpload, IconSend } from "@tabler/icons-react";
 import {redirect, useRouter} from "next/navigation";
 import {useEffect, useRef, useState} from "react";
 import { useSession } from "next-auth/react";
@@ -59,7 +59,7 @@ export default function CreatePage() {
                 onClick={() => fileInRef?.current?.click()}
                 type="button" variant="surface">
                 {!isUploading && (
-                  <CloudUploadIcon size={16}/>
+                  <IconCloudUpload size={20}></IconCloudUpload>
                 )}
                 {isUploading ? 'Uploading...' : 'Choose image'}
               </Button>
@@ -72,7 +72,7 @@ export default function CreatePage() {
       </div>
       <div className="flex mt-4 justify-center">
         <Button>
-          <SendIcon size={16}/>
+          <IconSend size={20}></IconSend>
           Publish
         </Button>
       </div>

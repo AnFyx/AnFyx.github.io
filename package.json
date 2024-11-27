@@ -36,6 +36,7 @@
     "webpurify": "^2.1.0"
   },
   "devDependencies": {
+    "@types/french-badwords-list": "^1.0.0",
     "@types/node": "^20",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18",

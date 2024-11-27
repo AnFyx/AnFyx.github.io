@@ -30,6 +30,7 @@ export default async function SettingsPage() {
         <form action={async () => {
           'use server';
           await signOut();
+          redirect('/login');
         }}>
           <Button type="submit" variant="outline">
             Logout

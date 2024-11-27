@@ -38,13 +38,16 @@ export async function getSessionEmailOrThrow(): Promise<string> {
 }
 
 export async function getSessionRole(): Promise<string> {
-  const userEmail = await getSessionEmailOrThrow();
-  const profile = await prisma.profile.findUnique({
-    where: {
-      email: userEmail,
-    },
-  });
-  return profile?.role || 'user';
+  const userEmail = await getSessionEmail();
+  if (userEmail) {
+    const profile = await prisma.profile.findUnique({
+      where: {
+        email: userEmail,
+      },
+    });
+    return profile?.role || 'user';
+  }
+  return 'user';
 }
 
 export async function updateProfile(data: FormData) {

@@ -68,7 +68,7 @@ export default async function SinglePostContent({
                       }}
                     >
                       <button type="submit" className="flex items-center">
-                        <IconTrash></IconTrash>
+                        <IconTrash />
                       </button>
                     </form>
                 )}

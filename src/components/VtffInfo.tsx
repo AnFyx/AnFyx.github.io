@@ -21,10 +21,8 @@ export default function VtffInfo({
       action={async (data:FormData) => {
         setVtffedByMe(prev => !prev);
         if (vtffedByMe) {
-          // remove vtff
           await removeVtffFromPost(data);
         } else {
-          // add vtff
           await vtffPost(data);
         }
         router.refresh();

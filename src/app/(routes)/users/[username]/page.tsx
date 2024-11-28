@@ -1,4 +1,4 @@
-import {getSessionEmail} from "@/actions";
+import {getSessionEmail, getSessionRole} from "@/actions";
 import ProfilePageContent from "@/components/ProfilePageContent";
 import {prisma} from "@/db";
 import {auth} from "@/auth";
@@ -14,6 +14,9 @@ export default async function UserProfilePage(props: Props) {
   const session = await auth();
   if (!session) {
     return redirect('/login');
+  }
+  if (await getSessionRole() !== 'user') {
+    return redirect('/');
   }
   const { username } = await props.params;
   const sessionEmail = await getSessionEmail() || '';

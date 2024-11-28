@@ -4,6 +4,7 @@ import SearchResults from "@/components/SearchResults";
 import {Suspense} from "react";
 import {auth} from "@/auth";
 import { redirect } from "next/navigation";
+import { getSessionRole } from "@/actions";
 
 export default async function SearchPage({
   searchParams,
@@ -13,6 +14,9 @@ export default async function SearchPage({
   const session = await auth();
   if (!session) {
     return redirect('/login');
+  }
+  if (await getSessionRole() !== 'user') {
+    return redirect('/');
   }
   const { query } = await searchParams;
   return (

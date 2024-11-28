@@ -1,6 +1,6 @@
 'use client';
 import {TextField} from "@radix-ui/themes";
-import {SearchIcon} from "lucide-react";
+import { IconSearch } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
 
 export default function SearchForm() {
@@ -14,7 +14,7 @@ export default function SearchForm() {
         name="query"
         placeholder="Search for posts or users...">
         <TextField.Slot>
-          <SearchIcon/>
+          <IconSearch />
         </TextField.Slot>
       </TextField.Root>
     </form>

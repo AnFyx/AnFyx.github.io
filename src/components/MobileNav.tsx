@@ -1,4 +1,4 @@
-import {CameraIcon, HomeIcon, LayoutGridIcon, SearchIcon, UserIcon} from "lucide-react";
+import { IconCamera, IconHome, IconLayoutGrid, IconLogout, IconSearch, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { getSessionRole } from "@/actions";
 
@@ -9,23 +9,23 @@ export default async function MobileNav() {
       <div className="flex text-gray-700 dark:text-gray-300 *:flex *:items-center">
         <div className="pl-2 bg-white dark:bg-gray-700 w-full relative z-10 *:size-12 *:flex *:items-center *:justify-center justify-around">
           <Link href="/" className="">
-            <HomeIcon/>
+            <IconHome/>
           </Link>
           {user && (
             <>
               <Link href="/search" className="">
-                <SearchIcon/>
+                <IconSearch/>
               </Link>
               <Link href="/create">
-                <CameraIcon/>
+                <IconCamera/>
               </Link>
               <Link href="/browse" className="text-ig-red dark:text-ig-orange">
-                <LayoutGridIcon/>
+                <IconLayoutGrid/>
               </Link>
             </>
           )}
           <Link href="/profile" className=" ">
-            <UserIcon/>
+            <IconUser/>
           </Link>
         </div>
       </div>

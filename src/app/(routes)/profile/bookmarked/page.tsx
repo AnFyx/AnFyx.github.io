@@ -1,3 +1,4 @@
+import { getSessionRole } from "@/actions";
 import {auth} from "@/auth";
 import PostsGrid from "@/components/PostsGrid";
 import ProfileNav from "@/components/ProfileNav";
@@ -9,6 +10,9 @@ export default async function BookmarkedPage() {
   const session = await auth();
   if (!session) {
     return redirect('/login');
+  }
+  if (await getSessionRole() !== 'user') {
+    return redirect('/');
   }
   const profile = await prisma.profile
     .findFirst({where:{email:session?.user?.email as string}});

@@ -1,8 +1,8 @@
-import {CameraIcon, LogOutIcon, HomeIcon, LayoutGridIcon, SearchIcon, UserIcon} from "lucide-react";
 import Link from "next/link";
 import {signOut} from "@/auth";
 import { getSessionRole } from "@/actions";
 import { redirect } from "next/navigation";
+import { IconCamera, IconHome, IconLayoutGrid, IconLogout, IconSearch, IconUser } from "@tabler/icons-react";
 
 export default async function DesktopNav() {
   const user = !['mod', 'admin'].includes(await getSessionRole());
@@ -14,27 +14,27 @@ export default async function DesktopNav() {
              alt=""/>
         <div className="ml-1 inline-flex flex-col gap-6 mt-8 *:flex *:items-center *:gap-2">
           <Link href={'/'}>
-            <HomeIcon/>
+            <IconHome />
             Home
           </Link>
           {user && (
             <>
               <Link href={'/search'}>
-                <SearchIcon />
+                <IconSearch />
                 Search
               </Link>
               <Link href={'/browse'}>
-                <LayoutGridIcon />
+                <IconLayoutGrid />
                 Browse
               </Link>
               <Link href={'/create'}>
-                <CameraIcon />
+                <IconCamera />
                 Create
               </Link>
             </>
           )}
           <Link href={'/profile'}>
-            <UserIcon/>
+            <IconUser />
             Profile
           </Link>
           <form action={async () => {
@@ -46,7 +46,7 @@ export default async function DesktopNav() {
               type="submit"
               className="flex items-center "
             >
-              <LogOutIcon className="mr-2" />
+              <IconLogout className="mr-2" />
                 Logout
             </button>
           </form>

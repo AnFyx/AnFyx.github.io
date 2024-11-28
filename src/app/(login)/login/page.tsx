@@ -1,9 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { redirect, useRouter } from 'next/navigation';
+import { signIn, useSession } from 'next-auth/react';
 
 export default function Login() {
+  const { data: session } = useSession();
+  if (session) {
+    return redirect('/');
+  }
   const router = useRouter();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

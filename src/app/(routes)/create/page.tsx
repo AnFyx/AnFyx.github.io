@@ -59,7 +59,7 @@ export default function CreatePage() {
                 onClick={() => fileInRef?.current?.click()}
                 type="button" variant="surface">
                 {!isUploading && (
-                  <IconCloudUpload size={20}></IconCloudUpload>
+                  <IconCloudUpload size={20}/>
                 )}
                 {isUploading ? 'Uploading...' : 'Choose image'}
               </Button>
@@ -72,7 +72,7 @@ export default function CreatePage() {
       </div>
       <div className="flex mt-4 justify-center">
         <Button>
-          <IconSend size={20}></IconSend>
+          <IconSend size={20}/>
           Publish
         </Button>
       </div>

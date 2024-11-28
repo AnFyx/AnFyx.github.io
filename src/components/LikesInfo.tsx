@@ -1,7 +1,7 @@
 'use client';
 import {likePost, removeLikeFromPost} from "@/actions";
 import {Like, Post} from "@prisma/client";
-import {ThumbsUp} from "lucide-react";
+import { IconThumbUp } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 
@@ -21,10 +21,8 @@ export default function LikesInfo({
       action={async (data:FormData) => {
         setLikedByMe(prev => !prev);
         if (likedByMe) {
-          // remove like
           await removeLikeFromPost(data);
         } else {
-          // add like
           await likePost(data);
         }
         router.refresh();
@@ -34,7 +32,7 @@ export default function LikesInfo({
       <button
         type="submit"
         className="">
-        <ThumbsUp className={likedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
+        <IconThumbUp className={likedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'} />
       </button>
       {showText && (
         <p>{post.likesCount}</p>

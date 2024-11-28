@@ -1,7 +1,7 @@
 'use client';
 import {dislikePost, removeDislikeFromPost} from "@/actions";
 import {Dislike, Post} from "@prisma/client";
-import {ThumbsDown} from "lucide-react";
+import { IconThumbDown } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 
@@ -34,7 +34,7 @@ export default function DislikesInfo({
       <button
         type="submit"
         className="">
-        <ThumbsDown className={dislikedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
+        <IconThumbDown className={dislikedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'} />
       </button>
       {showText && (
         <p>{post.dislikesCount}</p>

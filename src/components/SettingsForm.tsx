@@ -3,7 +3,7 @@
 import { updateProfile } from "@/actions";
 import { Profile } from "@prisma/client";
 import { Button, Switch, TextArea, TextField } from "@radix-ui/themes";
-import { CloudUploadIcon } from "lucide-react";
+import { IconCloudUpload } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -82,7 +82,7 @@ export default function SettingsForm({
             variant="surface"
             onClick={() => fileInRef.current?.click()}
           >
-            <CloudUploadIcon />
+            <IconCloudUpload />
             Change avatar
           </Button>
         </div>

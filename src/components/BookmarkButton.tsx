@@ -1,7 +1,7 @@
 'use client';
 import {bookmarkPost, likePost, removeLikeFromPost, unbookmarkPost} from "@/actions";
 import {Like, Post} from "@prisma/client";
-import {BookmarkIcon} from "lucide-react";
+import { IconBookmark } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 
@@ -19,10 +19,8 @@ export default function BookmarkButton({
       action={async (data:FormData) => {
         setBookmarkedByMe(prev => !prev);
         if (bookmarkedByMe) {
-          // remove bookmark
           await unbookmarkPost(post.id);
         } else {
-          // add bookmark
           await bookmarkPost(post.id);
         }
         router.refresh();
@@ -32,7 +30,7 @@ export default function BookmarkButton({
       <button
         type="submit"
         className="">
-        <BookmarkIcon className={bookmarkedByMe ? 'fill-gray-800 dark:text-white dark:fill-white' : 'dark:text-white'}/>
+          <IconBookmark className={bookmarkedByMe ? 'fill-gray-800 dark:text-white dark:fill-white' : 'dark:text-white'}/>
       </button>
     </form>
   );

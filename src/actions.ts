@@ -50,7 +50,7 @@ export async function getSessionRole(): Promise<string> {
   return 'user';
 }
 
-export async function updateProfile(data: FormData) {
+export async function updateProfile(data: FormData, role: string) {
   const userEmail = await getSessionEmailOrThrow();
   let usernameText = data.get('username') as string;
   if (leoProfanity.check(usernameText)) {
@@ -74,7 +74,7 @@ export async function updateProfile(data: FormData) {
     subtitle: subtitleText,
     bio: bioText,
     avatar: data.get('avatar') as string,
-    role: 'user',
+    role: role,
   };
   if (newUserInfo.avatar === '') {
     newUserInfo.avatar = "https://harlequin-keen-chickadee-753.mypinata.cloud/files/bafkreifznv3isngocvxcddhmtercz7qbs5vvu5adrdgvqjucl36ipfyh3m";
@@ -333,8 +333,7 @@ export async function deletePost(postId: string) {
   });
 }
 
-export async function deleteProfile() {
-  const sessionEmail = await getSessionEmailOrThrow();
+export async function deleteProfile(sessionEmail: string) {
   const userPosts = await prisma.post.findMany({
     where: { author: sessionEmail },
   });
@@ -360,5 +359,12 @@ export async function deleteProfile() {
   });
   await prisma.profile.delete({
     where: { email: sessionEmail },
+  });
+}
+
+export async function updateRole(sessionEmail: string, newRole: 'user' | 'mod' | 'admin') {
+  await prisma.profile.update({
+    where: { email: sessionEmail },
+    data: { role: newRole },
   });
 }

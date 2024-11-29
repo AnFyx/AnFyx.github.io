@@ -2,7 +2,7 @@ import Link from "next/link";
 import {signOut} from "@/auth";
 import { getSessionRole } from "@/actions";
 import { redirect } from "next/navigation";
-import { IconCamera, IconHome, IconLayoutGrid, IconLogout, IconSearch, IconUser } from "@tabler/icons-react";
+import { IconCamera, IconHome, IconLayoutGrid, IconLogout, IconSearch, IconSettings, IconUser } from "@tabler/icons-react";
 
 export default async function DesktopNav() {
   const user = !['mod', 'admin'].includes(await getSessionRole());
@@ -10,7 +10,7 @@ export default async function DesktopNav() {
     <div className="hidden md:block px-4 pb-4 w-48 shadow-md shadow-gray-400 dark:shadow-gray-600">
       <div className="top-4 sticky">
         <img className="dark:invert"
-             src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png"
+             src="https://harlequin-keen-chickadee-753.mypinata.cloud/files/bafkreifatxsgok3qmpgee3wnnm52mieitsrul7in6vzvdortkc7jie6b6u"
              alt=""/>
         <div className="ml-1 inline-flex flex-col gap-6 mt-8 *:flex *:items-center *:gap-2">
           <Link href={'/'}>
@@ -34,8 +34,18 @@ export default async function DesktopNav() {
             </>
           )}
           <Link href={'/profile'}>
-            <IconUser />
-            Profile
+            {user && (
+              <>
+              <IconUser />
+              Profile
+              </>
+            )}
+            {!user && (
+              <>
+              <IconSettings />
+              Settings
+              </>
+            )}
           </Link>
           <form action={async () => {
               'use server';

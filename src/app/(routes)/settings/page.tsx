@@ -25,6 +25,7 @@ export default async function SettingsPage() {
       </p>
       <SettingsForm
         profile={profile}
+        role={profile?.role === undefined ? 'user' : profile?.role}
       />
       <div className="flex justify-center mt-4 pt-4 border-t border-gray-300">
         <form action={async () => {

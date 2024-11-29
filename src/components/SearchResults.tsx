@@ -31,6 +31,7 @@ export default async function SearchResults({query}:{query:string}) {
             <Link
               href={`/users/${profile.username}`}
               className="flex gap-2 bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-2 rounded-full"
+              key={profile.id}
             >
               <div className="">
                 <Avatar

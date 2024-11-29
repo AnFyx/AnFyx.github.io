@@ -83,6 +83,14 @@ export default async function SinglePostContent({
               </div>
             </div>
           </div>
+          <div className="flex text-gray-700 dark:text-gray-400 items-center gap-2 justify-between py-4 mt-4 border-t border-b border-gray-300 dark:border-gray-700">
+            <LikesInfo post={post} sessionLike={myLike} />
+            <DislikesInfo post={post} sessionDislike={myDislike} />
+            <VtffsInfo post={post} sessionVtff={myVtff} />
+            <div className="flex items-center">
+              <BookmarkButton post={post} sessionBookmark={myBookmark} />
+            </div>
+          </div>
           <div className="pt-4 flex flex-col gap-4">
             {comments.map((comment: CommentModel) => (
               <div key={comment.id}>
@@ -97,15 +105,7 @@ export default async function SinglePostContent({
               </div>
             ))}
           </div>
-          <div className="flex text-gray-700 dark:text-gray-400 items-center gap-2 justify-between py-4 mt-4 border-t border-gray-300 dark:border-gray-700">
-            <LikesInfo post={post} sessionLike={myLike} />
-            <DislikesInfo post={post} sessionDislike={myDislike} />
-            <VtffsInfo post={post} sessionVtff={myVtff} />
-            <div className="flex items-center">
-              <BookmarkButton post={post} sessionBookmark={myBookmark} />
-            </div>
-          </div>
-          <div className="pt-8 border-t border-gray-300 dark:border-gray-700">
+          <div className="pt-8">
             <Suspense fallback={<Preloader />}>
               <SessionCommentForm postId={post.id} />
             </Suspense>

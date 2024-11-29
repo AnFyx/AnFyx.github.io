@@ -1,4 +1,4 @@
-import {getSessionEmailOrThrow, getSessionRole} from "@/actions";
+import {deleteProfile, getSessionEmailOrThrow, getSessionRole, updateRole} from "@/actions";
 import BookmarkButton from "@/components/BookmarkButton";
 import LikesInfo from "@/components/LikesInfo";
 import DislikesInfo from "@/components/DislikesInfo";
@@ -7,6 +7,8 @@ import {prisma} from "@/db";
 import {Bookmark, Dislike, Like, Profile, Vtff} from "@prisma/client";
 import {Avatar} from "@radix-ui/themes";
 import Link from "next/link";
+import { IconTrash, IconUser, IconUserCog, IconUserShield } from "@tabler/icons-react";
+import { redirect } from "next/navigation";
 
 export default async function HomePosts({
   profiles,
@@ -14,35 +16,103 @@ export default async function HomePosts({
   profiles: Profile[],
 }) {
   if (await getSessionRole() === 'admin') {
-
     return (
       <div>
         {profiles?.length > 0 && (
-          <div className="grid mt-4 sm:grid-cols-1 gap-2">
-            {profiles.map(profile => (
-              <Link
+          <div className="grid mt-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {profiles.map((profile) => (
+              <div
                 key={profile.id}
-                href={`/users/${profile.username}`}
-                className="flex gap-2 bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-2 rounded-full">
-                <div className="">
+                className="flex flex-col justify-between items-start bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-4 rounded-lg max-w-full overflow-hidden"
+              >
+                <div className="flex items-center gap-4 mb-4">
                   <Avatar
                     size="4"
                     radius="full"
                     fallback="user avatar"
-                    src={profile.avatar || ''}/>
+                    src={profile.avatar || ''}
+                  />
+                  <div>
+                    <h3>{profile.name}</h3>
+                    <h4 className="text-gray-500 dark:text-gray-300 text-sm">
+                      @{profile.username}
+                    </h4>
+                  </div>
                 </div>
-                <div>
-                  <h3>{profile.name}</h3>
-                  <h4 className="text-gray-500 dark:text-gray-300 text-sm">
-                    @{profile.username}
-                  </h4>
+  
+                {/* Buttons container */}
+                <div className="flex flex-wrap gap-2 w-full justify-start">
+                  {/* Change Role to User */}
+                  <form
+                    action={async () => {
+                      "use server";
+                      await updateRole(profile.email, 'user');
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="flex items-center gap-1 bg-gray-300 text-gray-900 px-3 py-2 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                    >
+                      <IconUser />
+                      <span>User</span>
+                    </button>
+                  </form>
+  
+                  {/* Change Role to Mod */}
+                  <form
+                    action={async () => {
+                      "use server";
+                      await updateRole(profile.email, 'mod');
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="flex items-center gap-1 bg-gray-300 text-gray-900 px-3 py-2 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                    >
+                      <IconUserShield />
+                      <span>Moderator</span>
+                    </button>
+                  </form>
+  
+                  {/* Change Role to Admin */}
+                  <form
+                    action={async () => {
+                      "use server";
+                      await updateRole(profile.email, 'admin');
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="flex items-center gap-1 bg-gray-300 text-gray-900 px-3 py-2 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                    >
+                      <IconUserCog />
+                      <span>Administrator</span>
+                    </button>
+                  </form>
+  
+                  {/* Delete Profile Form */}
+                  <form
+                    action={async () => {
+                      "use server";
+                      await deleteProfile(profile.email);
+                      redirect('/');
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="flex items-center gap-1 bg-gray-300 text-red-500 px-3 py-2 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
+                    >
+                      <IconTrash />
+                      <span>Delete</span>
+                    </button>
+                  </form>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
       </div>
-    )
+    );
   }
   const mod = await getSessionRole() === 'mod';
   const posts = await prisma.post.findMany({

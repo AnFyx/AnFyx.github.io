@@ -9,8 +9,10 @@ import { useEffect, useRef, useState } from "react";
 
 export default function SettingsForm({
   profile,
+  role,
 }: {
   profile: Profile | null;
+  role: string;
 }) {
   const router = useRouter();
   const fileInRef = useRef<HTMLInputElement>(null);
@@ -53,7 +55,7 @@ export default function SettingsForm({
   return (
     <form
       action={async (data: FormData) => {
-        await updateProfile(data);
+        await updateProfile(data, role);
         router.push("/profile");
         router.refresh();
       }}

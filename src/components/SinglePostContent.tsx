@@ -5,12 +5,11 @@ import DislikesInfo from "@/components/DislikesInfo";
 import VtffsInfo from "@/components/VtffInfo";
 import Preloader from "@/components/Preloader";
 import SessionCommentForm from "@/components/SessionCommentForm";
-import { Post, Profile, Comment as CommentModel, Like, Dislike, Vtff, Bookmark } from "@prisma/client";
+import { Post, Profile, Comment as CommentModel, Like, Dislike, Vtff, Bookmark, PostForApproval } from "@prisma/client";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar";
 import { IconTrash } from "@tabler/icons-react";
-import { getSessionEmail, deletePost } from "@/actions";
-import { redirect } from "next/navigation";
+import { getSessionEmail, deletePost, deleteApprovedPost, getSessionRole } from "@/actions";
 import { format } from "date-fns";
 
 export default async function SinglePostContent({
@@ -23,7 +22,7 @@ export default async function SinglePostContent({
   myVtff,
   myBookmark,
 }: {
-  post: Post;
+  post: Post | PostForApproval;
   authorProfile: Profile;
   comments: CommentModel[];
   commentsAuthors: Profile[];
@@ -34,6 +33,8 @@ export default async function SinglePostContent({
 }) {
   const currentUserEmail = await getSessionEmail();
   const isOwner = currentUserEmail === authorProfile.email;
+  const pendingPost = 'moderator' in post;
+  const role = await getSessionRole();
   return (
     <div>
       <div className="grid md:grid-cols-2 gap-4">
@@ -59,12 +60,15 @@ export default async function SinglePostContent({
                     @{authorProfile?.username}
                   </h4>
                 </div>
-                {isOwner && (
+                {(isOwner || role === 'mod') && (
                     <form
                       action={async () => {
                         "use server";
-                        await deletePost(post.id);
-                        redirect("/");
+                        try {
+                          await deletePost(post.id);
+                        } catch {
+                          await deleteApprovedPost(post.id);
+                        }   
                       }}
                     >
                       <button type="submit" className="flex items-center">
@@ -83,33 +87,39 @@ export default async function SinglePostContent({
               </div>
             </div>
           </div>
-          <div className="flex text-gray-700 dark:text-gray-400 items-center gap-2 justify-between py-4 mt-4 border-t border-b border-gray-300 dark:border-gray-700">
+          {role === 'user' && (
+            <div className="flex text-gray-700 dark:text-gray-400 items-center gap-2 justify-between py-4 mt-4 border-t border-b border-gray-300 dark:border-gray-700">
             <LikesInfo post={post} sessionLike={myLike} />
             <DislikesInfo post={post} sessionDislike={myDislike} />
             <VtffsInfo post={post} sessionVtff={myVtff} />
-            <div className="flex items-center">
-              <BookmarkButton post={post} sessionBookmark={myBookmark} />
-            </div>
-          </div>
-          <div className="pt-4 flex flex-col gap-4">
-            {comments.map((comment: CommentModel) => (
-              <div key={comment.id}>
-                <Comment
-                  createdAt={comment.createdAt}
-                  text={comment.text}
-                  authorProfile={commentsAuthors.find(
-                    (a) => a.email === comment.author
-                  )}
-                  commentId={comment.id}
-                />
+            {!pendingPost && (
+              <div className="flex items-center">
+                <BookmarkButton post={post} sessionBookmark={myBookmark} />
               </div>
-            ))}
+            )}
           </div>
-          <div className="pt-8">
-            <Suspense fallback={<Preloader />}>
-              <SessionCommentForm postId={post.id} />
-            </Suspense>
-          </div>
+          )}
+          <div className="pt-4 flex flex-col gap-4">
+          {comments.map((comment: CommentModel) => (
+            <div key={comment.id}>
+              <Comment
+                createdAt={comment.createdAt}
+                text={comment.text}
+                authorProfile={commentsAuthors.find(
+                  (a) => a.email === comment.author
+                )}
+                commentId={comment.id}
+              />
+            </div>
+          ))}
+        </div>
+          {role === 'user' && (
+            <div className="pt-8">
+              <Suspense fallback={<Preloader />}>
+                <SessionCommentForm postId={post.id} />
+              </Suspense>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -15,9 +15,6 @@ export default async function SearchPage({
   if (!session) {
     return redirect('/login');
   }
-  if (await getSessionRole() !== 'user') {
-    return redirect('/');
-  }
   const { query } = await searchParams;
   return (
     <div className="w-full">

@@ -1,21 +1,24 @@
-import {deleteProfile, getSessionEmailOrThrow, getSessionRole, updateRole} from "@/actions";
-import BookmarkButton from "@/components/BookmarkButton";
-import LikesInfo from "@/components/LikesInfo";
-import DislikesInfo from "@/components/DislikesInfo";
-import VtffInfo from "@/components/VtffInfo";
-import {prisma} from "@/db";
-import {Bookmark, Dislike, Like, Profile, Vtff} from "@prisma/client";
-import {Avatar} from "@radix-ui/themes";
+// src/components/HomePosts.tsx
+import { deleteProfile, getSessionRole, getSessionEmailOrThrow, updateRole } from "@/actions";
+import { prisma } from "@/db";
+import { Avatar } from "@radix-ui/themes";
 import Link from "next/link";
 import { IconTrash, IconUser, IconUserCog, IconUserShield } from "@tabler/icons-react";
+import SwipeablePost from "@/components/SwipeablePost"; // Client component for swipe handling
+import { Profile } from "@prisma/client";
+import LikesInfo from "./LikesInfo";
+import DislikesInfo from "./DislikesInfo";
+import VtffInfo from "./VtffInfo";
+import BookmarkButton from "./BookmarkButton";
 import { redirect } from "next/navigation";
 
 export default async function HomePosts({
   profiles,
-}:{
-  profiles: Profile[],
+}: {
+  profiles: Profile[];
 }) {
-  if (await getSessionRole() === 'admin') {
+  const currentUserRole = await getSessionRole();
+  if (currentUserRole === 'admin') {
     return (
       <div>
         {profiles?.length > 0 && (
@@ -32,13 +35,14 @@ export default async function HomePosts({
                     fallback="user avatar"
                     src={profile.avatar || ''}
                   />
-                  <div>
+                  <Link href={`/users/${profile?.username}`}>
                     <h3>{profile.name}</h3>
                     <h4 className="text-gray-500 dark:text-gray-300 text-sm">
                       @{profile.username}
                     </h4>
-                  </div>
+                  </Link>
                 </div>
+                <span>Current role: {profile.role}</span>
   
                 {/* Buttons container */}
                 <div className="flex flex-wrap gap-2 w-full justify-start">
@@ -47,6 +51,7 @@ export default async function HomePosts({
                     action={async () => {
                       "use server";
                       await updateRole(profile.email, 'user');
+                      redirect('/');
                     }}
                   >
                     <button
@@ -63,6 +68,7 @@ export default async function HomePosts({
                     action={async () => {
                       "use server";
                       await updateRole(profile.email, 'mod');
+                      redirect('/');
                     }}
                   >
                     <button
@@ -79,6 +85,7 @@ export default async function HomePosts({
                     action={async () => {
                       "use server";
                       await updateRole(profile.email, 'admin');
+                      redirect('/');
                     }}
                   >
                     <button
@@ -113,104 +120,106 @@ export default async function HomePosts({
         )}
       </div>
     );
-  }
-  const mod = await getSessionRole() === 'mod';
-  const posts = await prisma.post.findMany({
-    where: {
-      author: {in: profiles.map(p => p.email)},
-      approved: mod ? false : true,
-    },
-    orderBy: {
-      createdAt: mod ? 'asc' : 'desc',
-    },
-    take: 100,
-  });
-  let likes: Like[] = [];
-  let dislikes: Dislike[] = [];
-  let vtffs: Vtff[] = [];
-  let bookmarks: Bookmark[] = [];
-  if (!mod) {
-    likes = await prisma.like.findMany({
+  } else if (currentUserRole === 'mod') {
+    const posts = await prisma.postForApproval.findMany({
+      where: { moderator: await getSessionEmailOrThrow() },
+      orderBy: { createdAt: "asc" },
+      take: 100,
+    });
+
+    return (
+      <div className="max-w-md mx-auto flex flex-col gap-12">
+        {posts.map((post) => (
+          <SwipeablePost key={post.id} post={post} profiles={profiles} />
+        ))}
+      </div>
+    );
+  } else {
+    const posts = await prisma.post.findMany({
+      where: {
+        author: {in: profiles.map(p => p.email)},
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 100,
+    });
+    const likes = await prisma.like.findMany({
       where: {
         author: await getSessionEmailOrThrow(),
         postId: {in: posts.map(p => p.id)},
       },
     });
-    dislikes = await prisma.dislike.findMany({
+    const dislikes = await prisma.dislike.findMany({
       where: {
         author: await getSessionEmailOrThrow(),
         postId: {in: posts.map(p => p.id)},
       },
     });
-    vtffs = await prisma.vtff.findMany({
+    const vtffs = await prisma.vtff.findMany({
       where: {
         author: await getSessionEmailOrThrow(),
         postId: {in: posts.map(p => p.id)},
       },
     });
-    bookmarks = await prisma.bookmark.findMany({
+    const bookmarks = await prisma.bookmark.findMany({
       where: {
         author: await getSessionEmailOrThrow(),
         postId: {in: posts.map(p => p.id)},
       },
     });
-  }
-  return (
-    <div
-      className="max-w-md mx-auto flex flex-col gap-12">
-      {posts.map(post => {
-        const profile = profiles.find(p => p.email === post.author);
-        return (
-          <div
-            key={post.id}
-            className=""
-          >
-            <Link href={`/posts/${post.id}`}>
-              <img
-                className="block rounded-lg shadow-md shadow-black/50"
-                src={post.image} alt=""/>
-            </Link>
-            <div className="flex items-center gap-2 mt-4 justify-between">
-              <div className="flex gap-2 items-center">
-                <Avatar
-                  radius="full"
-                  src={profile?.avatar || ''}
-                  size="2"
-                  fallback="avatar" />
-                <Link
-                  className="font-bold text-gray-700 dark:text-gray-300"
-                  href={`/users/${profile?.username}`}>
-                  {profile?.name}
-                </Link>
-              </div>
-              {!mod && (
+    return (
+      <div className="max-w-md mx-auto flex flex-col gap-12">
+        {posts.map(post => {
+          const profile = profiles.find(p => p.email === post.author);
+          return (
+            <div key={post.id}>
+              <Link href={`/posts/${post.id}`}>
+                <img
+                  className="block rounded-lg shadow-md shadow-black/50"
+                  src={post.image} alt=""/>
+              </Link>
+              <div className="flex items-center gap-2 mt-4 justify-between">
                 <div className="flex gap-2 items-center">
-                <LikesInfo
-                  post={post}
-                  showText={false}
-                  sessionLike={likes.find(like => like.postId === post.id) || null}
-                />
-                <DislikesInfo
-                  post={post}
-                  showText={false}
-                  sessionDislike={dislikes.find(dislike => dislike.postId === post.id) || null}
-                />
-                <VtffInfo
-                  post={post}
-                  showText={false}
-                  sessionVtff={vtffs.find(vtff => vtff.postId === post.id) || null}
-                />
-                <BookmarkButton
-                  post={post}
-                  sessionBookmark={bookmarks.find(b => b.postId === post.id) || null} />
-              </div>)}
+                  <Avatar
+                    radius="full"
+                    src={profile?.avatar || ''}
+                    size="2"
+                    fallback="avatar" />
+                  <Link
+                    className="font-bold text-gray-700 dark:text-gray-300"
+                    href={`/users/${profile?.username}`}>
+                    {profile?.name}
+                  </Link>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <LikesInfo
+                    post={post}
+                    showText={false}
+                    sessionLike={likes.find(like => like.postId === post.id) || null}
+                  />
+                  <DislikesInfo
+                    post={post}
+                    showText={false}
+                    sessionDislike={dislikes.find(dislike => dislike.postId === post.id) || null}
+                  />
+                  <VtffInfo
+                    post={post}
+                    showText={false}
+                    sessionVtff={vtffs.find(vtff => vtff.postId === post.id) || null}
+                  />
+                  <BookmarkButton
+                    post={post}
+                    sessionBookmark={bookmarks.find(b => b.postId === post.id) || null} />
+                </div>
+              </div>
+              <p className="mt-2 text-slate-600 dark:text-gray-400">
+                {post.description}
+              </p>
             </div>
-            <p className="mt-2 text-slate-600 dark:text-gray-400">
-              {post.description}
-            </p>
-          </div>
-        );
-      })}
-    </div>
-  );
+          );
+        })}
+      </div>
+    );
+  }
 }

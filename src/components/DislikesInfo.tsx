@@ -1,6 +1,6 @@
 'use client';
 import {dislikePost, removeDislikeFromPost} from "@/actions";
-import {Dislike, Post} from "@prisma/client";
+import {Dislike, Post, PostForApproval} from "@prisma/client";
 import { IconThumbDown } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
@@ -10,7 +10,7 @@ export default function DislikesInfo({
   sessionDislike,
   showText=true,
 }:{
-  post:Post;
+  post:Post|PostForApproval;
   sessionDislike:Dislike|null;
   showText?:boolean;
 }) {
@@ -37,7 +37,7 @@ export default function DislikesInfo({
         <IconThumbDown className={dislikedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'} />
       </button>
       {showText && (
-        <p>{post.dislikesCount}</p>
+        <p>{'dislikesCount' in post ? post.dislikesCount : 0}</p>
       )}
     </form>
   );

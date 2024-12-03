@@ -26,14 +26,23 @@ model Profile {
 
 model Post {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  approved      Boolean  @default(false)
   author        String
   image         String
   description   String
   likesCount    Int      @default(0)
   dislikesCount Int      @default(0)
   vtffsCount    Int      @default(0)
+  createdAt     DateTime 
+  updatedAt     DateTime @updatedAt
+}
+
+model PostForApproval {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  author        String
+  image         String
+  description   String
   createdAt     DateTime @default(now())
+  moderator     String
   updatedAt     DateTime @updatedAt
 }
 

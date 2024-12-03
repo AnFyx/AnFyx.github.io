@@ -1,6 +1,6 @@
 'use client';
 import {vtffPost, removeVtffFromPost} from "@/actions";
-import {Vtff, Post} from "@prisma/client";
+import {Vtff, Post, PostForApproval} from "@prisma/client";
 import {IconHandMiddleFinger} from '@tabler/icons-react';
 import {useRouter} from "next/navigation";
 import {useState} from "react";
@@ -10,7 +10,7 @@ export default function VtffInfo({
   sessionVtff,
   showText=true,
 }:{
-  post:Post;
+  post:Post|PostForApproval;
   sessionVtff:Vtff|null;
   showText?:boolean;
 }) {
@@ -35,7 +35,7 @@ export default function VtffInfo({
         <IconHandMiddleFinger className={vtffedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
       </button>
       {showText && (
-        <p>{post.vtffsCount}</p>
+        <p>{'vtffsCount' in post ? post.vtffsCount : 0}</p>
       )}
     </form>
   );

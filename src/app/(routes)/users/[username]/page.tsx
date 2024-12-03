@@ -15,9 +15,6 @@ export default async function UserProfilePage(props: Props) {
   if (!session) {
     return redirect('/login');
   }
-  if (await getSessionRole() !== 'user') {
-    return redirect('/');
-  }
   const { username } = await props.params;
   const sessionEmail = await getSessionEmail() || '';
   const profile = await prisma.profile.findFirstOrThrow({

@@ -11,7 +11,8 @@ export default function ProfileNav({
 }) {
   const path = usePathname();
   const bookmarkedActive = path.includes('/bookmarked');
-  const postsActive = !bookmarkedActive;
+  const pendingActive = path.includes('/pending');
+  const postsActive = !bookmarkedActive && !pendingActive;
   return (
     <section className="mt-4">
       <div className="flex justify-center gap-4 font-bold">
@@ -33,6 +34,18 @@ export default function ProfileNav({
           }
             href={'/profile/bookmarked'}>
             Bookmarked
+          </Link>
+        )}
+        {isOurProfile && (
+          <Link
+            className={
+              pendingActive
+                ? 'text-gray-800 dark:text-gray-300'
+                : "text-gray-400 dark:text-gray-600"
+            }
+            href="/profile/pending"
+          >
+            Pending Approval
           </Link>
         )}
       </div>

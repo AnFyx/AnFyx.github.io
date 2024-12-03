@@ -6,6 +6,7 @@ import {uniq} from "lodash";
 import * as leoProfanity from "leo-profanity";
 import frenchBadWords from "french-badwords-list";
 import { v4 as uuidv4 } from "uuid";
+import { redirect } from "next/navigation";
 
 leoProfanity.loadDictionary("fr");
 leoProfanity.add(frenchBadWords.array);
@@ -97,12 +98,34 @@ export async function postEntry(data: FormData) {
   if (leoProfanity.check(descriptionText)) {
     descriptionText = maskProfanity(descriptionText);
   }
-  const postDoc = await prisma.post.create({
+  const moderators = await prisma.profile.findMany({
+    where: {
+      role: 'mod',
+    },
+  });
+  const randomModerator = moderators[Math.floor(Math.random() * moderators.length)];
+  const postDoc = await prisma.postForApproval.create({
     data: {
       author: sessionEmail,
       image: data.get('image') as string,
       description: descriptionText,
-      approved: false,
+      moderator: randomModerator.email,
+    },
+  });
+  return postDoc.id;
+}
+
+export async function approvePost(postId: string) {
+  const post = await prisma.postForApproval.findFirstOrThrow({
+    where: { id: postId },
+  });
+  deleteApprovedPost(postId);
+  const postDoc = await prisma.post.create({
+    data: {
+      author: post.author,
+      image: post.image,
+      description: post.description,
+      createdAt: post.createdAt,
     },
   });
   return postDoc.id;
@@ -216,7 +239,7 @@ export async function removeVtffFromPost(data: FormData) {
   await updatePostVtffsCount(postId);
 }
 
-export async function getSinglePostData(postId:string) {
+export async function getSingleApprovedPostData(postId:string) {
   const post = await prisma.post.findFirstOrThrow({where:{id:postId}});
   const authorProfile = await prisma.profile.findFirstOrThrow({where:{email:post.author}});
   const comments = await prisma.comment.findMany({where:{postId:post.id}});
@@ -256,6 +279,48 @@ export async function getSinglePostData(postId:string) {
     myVtff, myBookmark,
   };
 }
+
+export async function getSinglePostData(postId:string) {
+  const post = await prisma.postForApproval.findFirstOrThrow({where:{id:postId}});
+  const authorProfile = await prisma.profile.findFirstOrThrow({where:{email:post.author}});
+  const comments = await prisma.comment.findMany({where:{postId:post.id}});
+  const commentsAuthors = await prisma.profile.findMany({
+    where: {
+      email: {in: uniq(comments.map(c => c.author))},
+    },
+  });
+  const sessionEmail = await getSessionEmailOrThrow();
+  const myLike = await prisma.like.findFirst({
+    where: {
+      author: sessionEmail,
+      postId: post.id,
+    }
+  });
+  const myDislike = await prisma.dislike.findFirst({
+    where: {
+      author: sessionEmail,
+      postId: post.id,
+    }
+  });
+  const myVtff = await prisma.vtff.findFirst({
+    where: {
+      author: sessionEmail,
+      postId: post.id,
+    }
+  });
+  const myBookmark = await prisma.bookmark.findFirst({
+    where: {
+      author: sessionEmail,
+      postId: post.id,
+    }
+  });
+  return {
+    post, authorProfile, comments,
+    commentsAuthors, myLike, myDislike, 
+    myVtff, myBookmark,
+  };
+}
+
 
 export async function followProfile(profileIdToFollow:string) {
   const sessionProfile = await prisma.profile.findFirstOrThrow({
@@ -302,11 +367,10 @@ export async function unbookmarkPost(postId:string) {
   });
 }
 
-export async function deleteComment(commentId: string) {
-  const sessionEmail = await getSessionEmailOrThrow();
+export async function deleteComment(commentId: string, authorEmail: string) {
   await prisma.comment.delete({
     where: { 
-      author: sessionEmail,
+      author: authorEmail,
       id: commentId 
     },
   });
@@ -328,16 +392,44 @@ export async function deletePost(postId: string) {
   await prisma.comment.deleteMany({
     where: { postId: postId },
   });
+  await prisma.postForApproval.delete({
+    where: { id: postId },
+  });
+  redirect("/");
+}
+
+export async function deleteApprovedPost(postId: string) {
+  await prisma.like.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.dislike.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.vtff.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.bookmark.deleteMany({
+    where: { postId: postId },
+  });
+  await prisma.comment.deleteMany({
+    where: { postId: postId },
+  });
   await prisma.post.delete({
     where: { id: postId },
   });
+  redirect("/");
 }
 
 export async function deleteProfile(sessionEmail: string) {
   const userPosts = await prisma.post.findMany({
     where: { author: sessionEmail },
   });
-  const deletePromises = userPosts.map(post => deletePost(post.id));
+  const postsForApproval = await prisma.postForApproval.findMany({
+    where: { author: sessionEmail },
+  });
+  const deleteApprovalPromises = postsForApproval.map(post => deletePost(post.id));
+  await Promise.all(deleteApprovalPromises);
+  const deletePromises = userPosts.map(post => deleteApprovedPost(post.id));
   await Promise.all(deletePromises); 
   await prisma.like.deleteMany({
     where: { author: sessionEmail },

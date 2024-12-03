@@ -1,9 +1,9 @@
 'use client';
-import {Post} from "@prisma/client";
+import {Post, PostForApproval} from "@prisma/client";
 import Link from "next/link";
 import Masonry from 'react-masonry-css';
 
-export default function PostsGrid({ posts } : { posts: Post[] }) {
+export default function PostsGrid({ posts } : { posts: Post[] | PostForApproval[] }) {
   return (
     <div className="max-w-4xl mx-auto">
       <Masonry

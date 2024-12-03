@@ -9,11 +9,7 @@ export default async function BrowsePage() {
   if (!session) {
     return redirect('/login');
   }
-  if (await getSessionRole() !== 'user') {
-    return redirect('/');
-  }
   const posts = await prisma.post.findMany({
-    where: {approved: true},
     orderBy: {createdAt: 'desc'},
     take: 100,
   });

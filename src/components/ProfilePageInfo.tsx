@@ -1,9 +1,10 @@
+import { getSessionRole } from "@/actions";
 import FollowButton from "@/components/FollowButton";
 import { Follower, Profile } from "@prisma/client";
 import { IconCheck, IconSettings } from "@tabler/icons-react";
 import Link from "next/link";
 
-export default function ProfilePageInfo({
+export default async function ProfilePageInfo({
   profile,
   isOurProfile,
   ourFollow,
@@ -12,6 +13,7 @@ export default function ProfilePageInfo({
   isOurProfile: boolean;
   ourFollow: Follower | null;
 }) {
+  const user = await getSessionRole() === 'user';
   return (
     <div>
       <section className="flex items-center justify-between">
@@ -47,7 +49,7 @@ export default function ProfilePageInfo({
         <p className="text-gray-500 mt-1 mb-1">{profile.subtitle}</p>
         <p>{profile.bio}</p>
       </section>
-      {!isOurProfile && (
+      {!isOurProfile && user && (
         <section className="flex justify-center my-3">
           <FollowButton ourFollow={ourFollow} profileIdToFollow={profile.id} />
         </section>

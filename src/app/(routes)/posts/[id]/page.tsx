@@ -1,4 +1,4 @@
-import {getSessionRole, getSinglePostData} from "@/actions";
+import {getSessionRole, getSingleApprovedPostData, getSinglePostData} from "@/actions";
 import SinglePostContent from "@/components/SinglePostContent";
 import {auth} from "@/auth";
 import { redirect } from "next/navigation";
@@ -14,15 +14,21 @@ export default async function SinglePostPage(props: Props) {
   if (!session) {
     return redirect('/login');
   }
-  if (await getSessionRole() !== 'user') {
-    return redirect('/');
-  }
   const { id } = await props.params;
-  const {
-    post, authorProfile, comments,
-    commentsAuthors, myLike, myDislike, 
-    myVtff, myBookmark,
-  } = await getSinglePostData(id);
+  let post, authorProfile, comments, commentsAuthors, myLike, myDislike, myVtff, myBookmark;
+  try {
+    ({ 
+      post, authorProfile, comments, 
+      commentsAuthors, myLike, myDislike, 
+      myVtff, myBookmark 
+    } = await getSinglePostData(id));
+  } catch {
+    ({ 
+      post, authorProfile, comments, 
+      commentsAuthors, myLike, myDislike, 
+      myVtff, myBookmark 
+    } = await getSingleApprovedPostData(id));
+  }
   return (
     <SinglePostContent
       post={post}

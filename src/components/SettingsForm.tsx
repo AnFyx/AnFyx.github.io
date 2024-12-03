@@ -96,11 +96,12 @@ export default function SettingsForm({
         name="username"
         defaultValue={profile?.username || ""}
         placeholder="your_username"
+        required
       />
       <p className="mt-2 font-bold">Name</p>
       <TextField.Root
         name="name"
-        defaultValue={profile?.name || ""}
+        defaultValue={profile?.name || String(profile?.username)}
         placeholder="John Doe"
       />
       <p className="mt-2 font-bold">Subtitle</p>

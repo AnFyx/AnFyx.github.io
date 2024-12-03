@@ -1,6 +1,6 @@
 'use client';
 import {likePost, removeLikeFromPost} from "@/actions";
-import {Like, Post} from "@prisma/client";
+import {Like, Post, PostForApproval} from "@prisma/client";
 import { IconThumbUp } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
@@ -10,7 +10,7 @@ export default function LikesInfo({
   sessionLike,
   showText=true,
 }:{
-  post:Post;
+  post:Post|PostForApproval;
   sessionLike:Like|null;
   showText?:boolean;
 }) {
@@ -35,7 +35,7 @@ export default function LikesInfo({
         <IconThumbUp className={likedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'} />
       </button>
       {showText && (
-        <p>{post.likesCount}</p>
+        <p>{'likesCount' in post ? post.likesCount : 0}</p>
       )}
     </form>
   );

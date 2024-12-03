@@ -1,6 +1,6 @@
 'use client';
 import {bookmarkPost, likePost, removeLikeFromPost, unbookmarkPost} from "@/actions";
-import {Like, Post} from "@prisma/client";
+import {Like, Post, PostForApproval} from "@prisma/client";
 import { IconBookmark } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
@@ -9,7 +9,7 @@ export default function BookmarkButton({
   post,
   sessionBookmark,
 }:{
-  post:Post;
+  post:Post|PostForApproval;
   sessionBookmark:Like|null;
 }) {
   const router = useRouter();

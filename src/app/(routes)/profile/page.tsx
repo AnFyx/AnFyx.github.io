@@ -1,4 +1,3 @@
-import { getSessionRole } from "@/actions";
 import {auth} from "@/auth";
 import ProfilePageContent from "@/components/ProfilePageContent";
 import {prisma} from "@/db";
@@ -9,9 +8,10 @@ export default async function ProfilePage() {
   if (!session) {
     return redirect('/login');
   }
-  const profile = await prisma.profile
-    .findFirst({where:{email:session?.user?.email as string}});
-  if (!profile || await getSessionRole() !== 'user') {
+  const profile = await prisma.profile.findUnique({
+    where: {email: session?.user?.email as string},
+  });
+  if (profile?.username === undefined) {
     return redirect('/settings');
   }
   return (

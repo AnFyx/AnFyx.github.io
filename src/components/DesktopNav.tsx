@@ -1,11 +1,17 @@
 import Link from "next/link";
-import {signOut} from "@/auth";
+import {auth, signOut} from "@/auth";
 import { getSessionRole } from "@/actions";
 import { redirect } from "next/navigation";
 import { IconCamera, IconHome, IconLayoutGrid, IconLogout, IconSearch, IconSettings, IconUser } from "@tabler/icons-react";
+import { prisma } from "@/db";
+import Image from "next/image";
 
 export default async function DesktopNav() {
+  const session = await auth();
   const user = !['mod', 'admin'].includes(await getSessionRole());
+  const profile = await prisma.profile.findUnique({
+    where: {email: session?.user?.email as string},
+  });
   return (
     <div
       className="
@@ -22,9 +28,15 @@ export default async function DesktopNav() {
       p-4"
     >
       <div className="top-4 sticky">
-        <img className="dark:invert"
-             src="https://harlequin-keen-chickadee-753.mypinata.cloud/files/bafkreifatxsgok3qmpgee3wnnm52mieitsrul7in6vzvdortkc7jie6b6u"
-             alt=""/>
+        <Image 
+          className="dark:invert"
+          src="https://harlequin-keen-chickadee-753.mypinata.cloud/files/bafkreifatxsgok3qmpgee3wnnm52mieitsrul7in6vzvdortkc7jie6b6u"
+          alt="InstaLaid"
+          layout="intrinsic"
+          width={800}
+          height={600}
+          unoptimized
+        />
         <div className="ml-1 inline-flex flex-col gap-6 mt-8 *:flex *:items-center *:gap-2">
           <Link href={'/'}>
             <IconHome />
@@ -38,7 +50,7 @@ export default async function DesktopNav() {
             <IconLayoutGrid />
             Browse
           </Link>
-          {user && (
+          {(user && profile?.username !== undefined) && (
               <Link href={'/create'}>
                 <IconCamera />
                 Create

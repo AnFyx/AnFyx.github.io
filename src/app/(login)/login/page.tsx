@@ -1,19 +1,22 @@
 'use client';
 
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
-import { IconBrandGoogle } from '@tabler/icons-react';
+import React, { FormEvent, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function Login() {
   const { data: session } = useSession();
-  if (session) {
-    return redirect('/');
-  }
   const router = useRouter();
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (session) {
+      router.push('/');
+    }
+  }, [session, router]);
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const result = await signIn('google', {
-      callbackUrl: '/'
+      callbackUrl: '/',
     });
     if (result?.ok) {
       router.push('/');
@@ -42,10 +45,13 @@ export default function Login() {
           >
             Login with Google
           </button>
-          <img
-            src="../icon.ico"
+          <Image
+            src={'/icon.ico'}
             alt="A pointless image"
-            className="rotate-45 opacity-80 w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24"
+            className="rotate-45 opacity-80"
+            width={96}
+            height={96}
+            priority
           />
         </form>
       </div>

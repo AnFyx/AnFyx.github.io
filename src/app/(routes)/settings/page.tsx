@@ -1,7 +1,8 @@
+import { deleteProfile } from "@/actions";
 import {auth, signOut} from "@/auth";
 import SettingsForm from "@/components/SettingsForm";
 import {prisma} from "@/db";
-import {Button} from "@radix-ui/themes";
+import { IconLogout, IconTrash } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
@@ -27,15 +28,39 @@ export default async function SettingsPage() {
         profile={profile}
         role={profile?.role === undefined ? 'user' : profile?.role}
       />
-      <div className="flex justify-center mt-4 pt-4 border-t border-gray-300">
-        <form action={async () => {
-          'use server';
-          await signOut();
-          redirect('/login');
-        }}>
-          <Button type="submit" variant="outline">
-            Logout
-          </Button>
+      <div className="flex justify-center mt-4 pt-4 border-t border-gray-300 gap-4">
+        <form
+          action={async () => {
+            'use server';
+            await signOut();
+            redirect('/login');
+          }}
+        >
+          <button
+            type="submit"
+            className="flex items-center gap-1 bg-violet-500 text-gray-300 px-3 py-2 rounded-md hover:bg-violet-600"
+          >
+            <IconLogout />
+            <span>Logout</span>
+          </button>
+        </form>
+        <form
+          action={async () => {
+            'use server';
+            await signOut();
+            if (session.user?.email) {
+              await deleteProfile(session.user.email);
+            }
+            redirect('/');
+          }}
+        >
+          <button
+            type="submit"
+            className="flex items-center gap-1 bg-red-500 text-gray-300 px-3 py-2 rounded-md hover:bg-red-600"
+          >
+            <IconTrash />
+            <span>Delete</span>
+          </button>
         </form>
       </div>
     </div>

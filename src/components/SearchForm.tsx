@@ -12,7 +12,9 @@ export default function SearchForm() {
     }}>
       <TextField.Root
         name="query"
-        placeholder="Search for posts or users...">
+        placeholder="Search for posts or users..."
+        maxLength={32}
+      >
         <TextField.Slot>
           <IconSearch />
         </TextField.Slot>

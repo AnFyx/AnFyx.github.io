@@ -1,4 +1,4 @@
-import {getSessionEmail, getSessionRole} from "@/actions";
+import {getSessionEmail} from "@/actions";
 import ProfilePageContent from "@/components/ProfilePageContent";
 import {prisma} from "@/db";
 import {auth} from "@/auth";
@@ -14,6 +14,12 @@ export default async function UserProfilePage(props: Props) {
   const session = await auth();
   if (!session) {
     return redirect('/login');
+  }
+  const profileExists = await prisma.profile.findUnique({
+    where: {email: session?.user?.email as string},
+  });
+  if (profileExists?.username === undefined) {
+    return redirect('/settings');
   }
   const { username } = await props.params;
   const sessionEmail = await getSessionEmail() || '';

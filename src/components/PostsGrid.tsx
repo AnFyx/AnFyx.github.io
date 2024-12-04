@@ -1,5 +1,6 @@
 'use client';
 import {Post, PostForApproval} from "@prisma/client";
+import Image from "next/image";
 import Link from "next/link";
 import Masonry from 'react-masonry-css';
 
@@ -18,9 +19,15 @@ export default function PostsGrid({ posts } : { posts: Post[] | PostForApproval[
           <Link
             key={post.id}
             href={`/posts/${post.id}`} className="block mb-4">
-            <img
+            <Image
               className="rounded-lg"
-              src={post.image} alt="" />
+              src={post.image}
+              alt=""
+              layout="intrinsic"
+              width={800}
+              height={600}
+              unoptimized
+            />
           </Link>
         ))}
       </Masonry>

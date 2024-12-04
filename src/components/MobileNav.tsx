@@ -1,11 +1,16 @@
 import { IconCamera, IconHome, IconLayoutGrid, IconLogout, IconSearch, IconSettings, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { getSessionRole } from "@/actions";
-import { signOut } from "@/auth";
+import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
+import { prisma } from "@/db";
 
 export default async function MobileNav() {
+  const session = await auth();
   const user = !['mod', 'admin'].includes(await getSessionRole());
+  const profile = await prisma.profile.findUnique({
+    where: {email: session?.user?.email as string},
+  });
   return (
     <div className="block md:hidden fixed bottom-0 left-0 right-0 shadow-[0_-4px_4px_-1px_rgba(0,0,0,0.1)] shadow-gray-400 dark:shadow-gray-600">
       <div className="flex text-gray-700 dark:text-gray-300 *:flex *:items-center">
@@ -29,7 +34,7 @@ export default async function MobileNav() {
           <Link href="/search">
             <IconSearch/>
           </Link>
-          {user && (
+          {(user && profile?.username !== undefined) && (
             <Link href="/create">
               <IconCamera/>
             </Link>

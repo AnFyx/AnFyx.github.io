@@ -1,5 +1,4 @@
-// src/components/SwipeablePost.tsx
-"use client"; // Required for client components
+"use client";
 
 import { approvePost, deletePost } from "@/actions";
 import { useSwipeable } from "react-swipeable";
@@ -7,6 +6,7 @@ import Link from "next/link";
 import { Avatar } from "@radix-ui/themes";
 import { PostForApproval, Profile } from "@prisma/client";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default function SwipeablePost({
   post,
@@ -20,14 +20,22 @@ export default function SwipeablePost({
     onSwipedLeft: () => deletePost(post.id),
     onSwipedRight: () => {
         approvePost(post.id),
-        redirect('/');},
+        redirect('/')},
     preventScrollOnSwipe: true,
   });
 
   return (
     <div {...swipeHandlers} className="p-4 bg-gray-200 dark:bg-gray-800 rounded-lg">
       <Link href={`/posts/${post.id}`}>
-        <img className="rounded-lg" src={post.image} alt="Post" />
+        <Image
+          className="rounded-lg"
+          src={post.image}
+          alt="Post"
+          layout="intrinsic"
+          width={800}
+          height={600}
+          unoptimized
+        />
       </Link>
       <div className="flex gap-2 mt-4 items-center">
         <Avatar radius="full" src={profile?.avatar || ''} size="2" fallback="avatar" />

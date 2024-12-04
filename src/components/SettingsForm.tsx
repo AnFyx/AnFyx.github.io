@@ -4,6 +4,7 @@ import { updateProfile } from "@/actions";
 import { Profile } from "@prisma/client";
 import { Button, Switch, TextArea, TextField } from "@radix-ui/themes";
 import { IconCloudUpload } from "@tabler/icons-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -65,10 +66,14 @@ export default function SettingsForm({
       <div className="flex gap-4 items-center">
         <div>
           <div className="bg-gray-400 size-24 rounded-full overflow-hidden aspect-square shadow-md shadow-gray-400">
-            <img
+            <Image
               className="object-cover w-full h-full"
-              src={avatarUrl || "./default_avatar.jpg"}
+              src={avatarUrl || ""}
               alt="User Avatar"
+              layout="intrinsic"
+              width={600}
+              height={600}
+              unoptimized
             />
           </div>
         </div>

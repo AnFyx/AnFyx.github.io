@@ -11,6 +11,7 @@ import DislikesInfo from "./DislikesInfo";
 import VtffInfo from "./VtffInfo";
 import BookmarkButton from "./BookmarkButton";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default async function HomePosts({
   profiles,
@@ -175,9 +176,15 @@ export default async function HomePosts({
           return (
             <div key={post.id}>
               <Link href={`/posts/${post.id}`}>
-                <img
+                <Image
                   className="block rounded-lg shadow-md shadow-black/50"
-                  src={post.image} alt=""/>
+                  src={post.image}
+                  alt=""
+                  layout="intrinsic"
+                  width={800}
+                  height={600}
+                  unoptimized
+                />
               </Link>
               <div className="flex items-center gap-2 mt-4 justify-between">
                 <div className="flex gap-2 items-center">

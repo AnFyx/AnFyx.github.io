@@ -5,6 +5,7 @@ import { IconCloudUpload, IconSend } from "@tabler/icons-react";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
+import Image from 'next/image';
 
 export default function CreatePage() {
   const { data: session } = useSession();
@@ -51,7 +52,15 @@ export default function CreatePage() {
         <div>
           <div className="min-h-64 p-2 bg-gray-400 rounded-md relative">
             {imageUrl && (
-              <img src={imageUrl} className="rounded-md" alt="Uploaded" />
+              <Image
+                src={imageUrl}
+                alt="Uploaded"
+                layout="intrinsic"
+                width={800}
+                height={600}
+                unoptimized
+                className="rounded-md"
+              />
             )}
             <div className="absolute inset-0 flex items-center justify-center">
               <input

@@ -1,5 +1,5 @@
 'use client';
-import {bookmarkPost, likePost, removeLikeFromPost, unbookmarkPost} from "@/actions";
+import {bookmarkPost, unbookmarkPost} from "@/actions";
 import {Like, Post, PostForApproval} from "@prisma/client";
 import { IconBookmark } from "@tabler/icons-react";
 import {useRouter} from "next/navigation";
@@ -16,7 +16,7 @@ export default function BookmarkButton({
   const [bookmarkedByMe, setBookmarkedByMe] = useState(!!sessionBookmark);
   return (
     <form
-      action={async (data:FormData) => {
+      action={async () => {
         setBookmarkedByMe(prev => !prev);
         if (bookmarkedByMe) {
           await unbookmarkPost(post.id);

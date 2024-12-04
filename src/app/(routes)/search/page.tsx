@@ -4,7 +4,7 @@ import SearchResults from "@/components/SearchResults";
 import {Suspense} from "react";
 import {auth} from "@/auth";
 import { redirect } from "next/navigation";
-import { getSessionRole } from "@/actions";
+import { prisma } from "@/db";
 
 export default async function SearchPage({
   searchParams,
@@ -14,6 +14,12 @@ export default async function SearchPage({
   const session = await auth();
   if (!session) {
     return redirect('/login');
+  }
+  const profile = await prisma.profile.findUnique({
+    where: {email: session?.user?.email as string},
+  });
+  if (profile?.username === undefined) {
+    return redirect('/settings');
   }
   const { query } = await searchParams;
   return (

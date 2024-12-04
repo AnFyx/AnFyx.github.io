@@ -11,6 +11,7 @@ import Avatar from "@/components/Avatar";
 import { IconTrash } from "@tabler/icons-react";
 import { getSessionEmail, deletePost, deleteApprovedPost, getSessionRole } from "@/actions";
 import { format } from "date-fns";
+import Image from "next/image";
 
 export default async function SinglePostContent({
   post,
@@ -39,10 +40,14 @@ export default async function SinglePostContent({
     <div>
       <div className="grid md:grid-cols-2 gap-4">
         <div>
-          <img
+          <Image
             className="rounded-md"
             src={post.image}
             alt={post.description}
+            layout="intrinsic"
+            width={800}
+            height={600}
+            unoptimized
           />
         </div>
         <div>

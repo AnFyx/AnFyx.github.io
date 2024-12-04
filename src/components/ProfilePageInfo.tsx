@@ -2,6 +2,7 @@ import { getSessionRole } from "@/actions";
 import FollowButton from "@/components/FollowButton";
 import { Follower, Profile } from "@prisma/client";
 import { IconCheck, IconSettings } from "@tabler/icons-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function ProfilePageInfo({
@@ -35,10 +36,14 @@ export default async function ProfilePageInfo({
         <div className="w-48 h-48 p-2 rounded-full bg-gradient-to-tr from-ig-orange to-ig-red">
           <div className="w-44 h-44 p-2 bg-white dark:bg-black rounded-full">
             <div className="w-40 h-40 aspect-square overflow-hidden rounded-full">
-              <img
+              <Image
                 className=""
-                src={profile.avatar || "./default_avatar.jpg"}
-                alt="profile avatar"
+                src={profile.avatar || ""}
+                alt="Profile Avatar"
+                layout="intrinsic"
+                width={600}
+                height={600}
+                unoptimized
               />
             </div>
           </div>

@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function Avatar({
   src,
 }:{
@@ -5,9 +7,14 @@ export default function Avatar({
 }) {
   return (
     <div className="size-16 aspect-square overflow-hidden rounded-full">
-      <img
+      <Image
         src={src}
-        alt=""/>
+        alt=""
+        layout="intrinsic"
+        width={600}
+        height={600}
+        unoptimized
+      />
     </div>
   );
 }

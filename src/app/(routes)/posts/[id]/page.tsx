@@ -1,7 +1,8 @@
-import {getSessionRole, getSingleApprovedPostData, getSinglePostData} from "@/actions";
+import {getSingleApprovedPostData, getSinglePostData} from "@/actions";
 import SinglePostContent from "@/components/SinglePostContent";
 import {auth} from "@/auth";
 import { redirect } from "next/navigation";
+import { prisma } from "@/db";
 
 type Props = {
   params: {
@@ -13,6 +14,12 @@ export default async function SinglePostPage(props: Props) {
   const session = await auth();
   if (!session) {
     return redirect('/login');
+  }
+  const profile = await prisma.profile.findUnique({
+    where: {email: session?.user?.email as string},
+  });
+  if (profile?.username === undefined) {
+    return redirect('/settings');
   }
   const { id } = await props.params;
   let post, authorProfile, comments, commentsAuthors, myLike, myDislike, myVtff, myBookmark;

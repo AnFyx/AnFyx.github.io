@@ -1,4 +1,3 @@
-// src/components/HomePosts.tsx
 import { deleteProfile, getSessionRole, getSessionEmailOrThrow, updateRole } from "@/actions";
 import { prisma } from "@/db";
 import { Avatar } from "@radix-ui/themes";
@@ -180,9 +179,11 @@ export default async function HomePosts({
                   className="block rounded-lg shadow-md shadow-black/50"
                   src={post.image}
                   alt=""
-                  layout="intrinsic"
                   width={800}
                   height={600}
+                  style={{
+                    aspectRatio: 'initial',
+                  }}
                   unoptimized
                 />
               </Link>

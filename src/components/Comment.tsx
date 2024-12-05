@@ -20,11 +20,11 @@ export default async function Comment ({
 }) {
   const currentUserEmail = await getSessionEmail();
   const isOwner = currentUserEmail === authorProfile?.email;
-  const mod = await getSessionRole() === 'mod';
+  const mod = (await getSessionRole()) === 'mod';
   const currentHeaders = await headers();
   const currentPath = currentHeaders.get("referer") || "/";
   return (
-    <div className="flex gap-2">
+    (<div className="flex gap-2">
       <div>
         <Avatar src={authorProfile?.avatar || ''}/>
       </div>
@@ -39,7 +39,7 @@ export default async function Comment ({
             </h4>
           </Link>
           {(isOwner || mod) && ( // Conditionally render the delete button if the user is the owner
-            <form
+            (<form
               action={async () => {
                 "use server";
                 if (authorProfile) {
@@ -51,7 +51,7 @@ export default async function Comment ({
               <button type="submit" className="flex items-center">
                 <IconTrash />
               </button>
-            </form>
+            </form>)
           )}
         </div>
         <div>
@@ -65,6 +65,6 @@ export default async function Comment ({
           </div>
         </div>
       </div>
-    </div>
+    </div>)
   );
 }

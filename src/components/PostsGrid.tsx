@@ -23,9 +23,11 @@ export default function PostsGrid({ posts } : { posts: Post[] | PostForApproval[
               className="rounded-lg"
               src={post.image}
               alt=""
-              layout="intrinsic"
               width={800}
               height={600}
+              style={{
+                aspectRatio: 'initial',
+              }}
               unoptimized
             />
           </Link>

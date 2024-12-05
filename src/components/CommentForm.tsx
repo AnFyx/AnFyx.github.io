@@ -25,7 +25,9 @@ export default function CommentForm({avatar,postId}:{avatar:string;postId:string
           <TextArea
             ref={areaRef}
             name="text"
-            placeholder="Tell the world what you think..."/>
+            placeholder="Tell the world what you think..."
+            maxLength={256}
+          />
           <div>
             <Button>Post comment</Button>
           </div>

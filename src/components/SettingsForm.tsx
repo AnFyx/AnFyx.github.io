@@ -20,6 +20,10 @@ export default function SettingsForm({
   const [file, setFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar || null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [username, setUsername] = useState(profile?.username || "");
+  const [usernameValid, setUsernameValid] = useState(true);
+  const [usernameTaken, setUsernameTaken] = useState(false);
+  const usernameRegex = /^[A-Za-z0-9\-_\.]+$/;
 
   // Handle file upload and avatar preview
   useEffect(() => {
@@ -53,6 +57,26 @@ export default function SettingsForm({
     window.location.reload();
   };
 
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUsername = e.target.value;
+    setUsername(newUsername);
+    const isValid = usernameRegex.test(newUsername);
+    setUsernameValid(isValid);
+    if (isValid) {
+      fetch(`/api/checkUsername?username=${encodeURIComponent(newUsername)}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to check username: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((isTaken) => setUsernameTaken(isTaken))
+        .catch((error) => console.error("Error checking username:", error));
+    } else {
+      setUsernameTaken(false);
+    }
+  };
+  
   return (
     <form
       action={async (data: FormData) => {
@@ -70,9 +94,11 @@ export default function SettingsForm({
               className="object-cover w-full h-full"
               src={avatarUrl || ""}
               alt="User Avatar"
-              layout="intrinsic"
               width={600}
               height={600}
+              style={{
+                aspectRatio: 'initial',
+              }}
               unoptimized
             />
           </div>
@@ -95,28 +121,41 @@ export default function SettingsForm({
         </div>
       </div>
 
-      {/* User Info Fields */}
+      {/* Username Section */}
       <p className="mt-2 font-bold">Username</p>
       <TextField.Root
         name="username"
-        defaultValue={profile?.username || ""}
+        value={username}
+        onChange={handleUsernameChange}
         placeholder="your_username"
+        maxLength={32}
         required
       />
+      {!usernameValid && <p className="text-red-500">Username can only contain letters, numbers, &quot;-&quot;, &quot;_&quot;, and &quot;.&quot;</p>}
+      {usernameTaken && <p className="text-red-500">Username is already taken</p>}
+
+      {/* User Info Fields */}
       <p className="mt-2 font-bold">Name</p>
       <TextField.Root
         name="name"
         defaultValue={profile?.name || String(profile?.username)}
         placeholder="John Doe"
+        maxLength={32}
       />
       <p className="mt-2 font-bold">Subtitle</p>
       <TextField.Root
         name="subtitle"
         defaultValue={profile?.subtitle || ""}
-        placeholder="Graphic Designer"
+        placeholder="Professional Shitposter"
+        maxLength={32}
       />
       <p className="mt-2 font-bold">Bio</p>
-      <TextArea name="bio" defaultValue={profile?.bio || ""} />
+      <TextArea
+        name="bio"
+        defaultValue={profile?.bio || ""} 
+        placeholder="Tell us about yourself..."
+        maxLength={256}
+      />
 
       {/* Dark Mode Toggle */}
       <label className="flex gap-2 items-center mt-4">
@@ -129,7 +168,7 @@ export default function SettingsForm({
 
       {/* Save Button */}
       <div className="mt-6 flex justify-center">
-        <Button variant="solid">Save settings</Button>
+        <Button variant="solid" disabled={!usernameValid || usernameTaken}>Save settings</Button>
       </div>
     </form>
   );

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import React, { FormEvent, useEffect } from 'react';
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function Login() {
   const { data: session } = useSession();
@@ -51,6 +51,9 @@ export default function Login() {
             className="rotate-45 opacity-80"
             width={96}
             height={96}
+            style={{
+              aspectRatio: 'initial',
+            }}
             priority
           />
         </form>

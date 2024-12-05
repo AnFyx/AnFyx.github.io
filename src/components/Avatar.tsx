@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function Avatar({
   src,
@@ -10,9 +10,11 @@ export default function Avatar({
       <Image
         src={src}
         alt=""
-        layout="intrinsic"
         width={600}
         height={600}
+        style={{
+          aspectRatio: 'initial',
+        }}
         unoptimized
       />
     </div>

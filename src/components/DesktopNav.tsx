@@ -32,9 +32,11 @@ export default async function DesktopNav() {
           className="dark:invert"
           src="https://harlequin-keen-chickadee-753.mypinata.cloud/files/bafkreifatxsgok3qmpgee3wnnm52mieitsrul7in6vzvdortkc7jie6b6u"
           alt="InstaLaid"
-          layout="intrinsic"
           width={800}
           height={600}
+          style={{
+            aspectRatio: 'initial',
+          }}
           unoptimized
         />
         <div className="ml-1 inline-flex flex-col gap-6 mt-8 *:flex *:items-center *:gap-2">

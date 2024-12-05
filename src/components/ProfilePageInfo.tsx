@@ -14,7 +14,7 @@ export default async function ProfilePageInfo({
   isOurProfile: boolean;
   ourFollow: Follower | null;
 }) {
-  const user = await getSessionRole() === 'user';
+  const user = (await getSessionRole()) === 'user';
   return (
     <div>
       <section className="flex items-center justify-between">
@@ -40,9 +40,11 @@ export default async function ProfilePageInfo({
                 className=""
                 src={profile.avatar || ""}
                 alt="Profile Avatar"
-                layout="intrinsic"
                 width={600}
                 height={600}
+                style={{
+                  aspectRatio: 'initial',
+                }}
                 unoptimized
               />
             </div>

@@ -54,8 +54,19 @@ export async function getSessionRole(): Promise<string> {
 export async function updateProfile(data: FormData, role: string) {
   const userEmail = await getSessionEmailOrThrow();
   let usernameText = data.get('username') as string;
+  let isTaken = true;
   if (leoProfanity.check(usernameText)) {
     usernameText = 'user' + uuidv4().split('-')[0];
+    while (isTaken) {
+      const doesUserExist = await prisma.profile.findFirst({
+        where: { username: usernameText },
+      });
+      if (doesUserExist) {
+        usernameText = 'user' + uuidv4().split('-')[0];
+      } else {
+        isTaken = false;
+      }
+    }
   }
   let nameText = data.get('name') as string;
   if (leoProfanity.check(nameText)) {

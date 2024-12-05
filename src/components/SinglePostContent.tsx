@@ -12,6 +12,7 @@ import { IconTrash } from "@tabler/icons-react";
 import { getSessionEmail, deletePost, deleteApprovedPost, getSessionRole } from "@/actions";
 import { format } from "date-fns";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function SinglePostContent({
   post,
@@ -44,9 +45,11 @@ export default async function SinglePostContent({
             className="rounded-md"
             src={post.image}
             alt={post.description}
-            layout="intrinsic"
             width={800}
             height={600}
+            style={{
+              aspectRatio: 'initial',
+            }}
             unoptimized
           />
         </div>
@@ -57,14 +60,14 @@ export default async function SinglePostContent({
             </div>
             <div className="w-full">
               <div className="flex justify-between gap-2">
-                <div>
+                <Link href={`/users/${authorProfile.username}`}>
                   <h3 className="flex gap-1 dark:text-gray-300">
                     {authorProfile?.name}
                   </h3>
                   <h4 className="text-gray-600 dark:text-gray-500 text-sm -mt-1">
                     @{authorProfile?.username}
                   </h4>
-                </div>
+                </Link>
                 {(isOwner || role === 'mod') && (
                     <form
                       action={async () => {

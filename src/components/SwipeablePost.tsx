@@ -19,8 +19,9 @@ export default function SwipeablePost({
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => deletePost(post.id),
     onSwipedRight: () => {
-        approvePost(post.id),
-        redirect('/')},
+      approvePost(post.id);
+      redirect('/');
+    },
     preventScrollOnSwipe: true,
   });
 
@@ -31,9 +32,11 @@ export default function SwipeablePost({
           className="rounded-lg"
           src={post.image}
           alt="Post"
-          layout="intrinsic"
           width={800}
           height={600}
+          style={{
+            aspectRatio: 'initial',
+          }}
           unoptimized
         />
       </Link>

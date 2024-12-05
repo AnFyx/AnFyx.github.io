@@ -11,7 +11,7 @@ export default async function pendingApprovalPage() {
   if (!session) {
     return redirect('/login');
   }
-  if (await getSessionRole() !== 'user') {
+  if ((await getSessionRole()) !== 'user') {
     return redirect('/');
   }
   const profile = await prisma.profile

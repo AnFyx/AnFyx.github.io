@@ -22,7 +22,7 @@ export default function ProfileNav({
               ? 'text-gray-800 dark:text-gray-300'
               : "text-gray-400 dark:text-gray-600"
         }
-          href={isOurProfile ? '/profile' : `/${username}`}>
+          href={isOurProfile ? '/profile' : `/users/${username}`}>
           Posts
         </Link>
         {isOurProfile && (

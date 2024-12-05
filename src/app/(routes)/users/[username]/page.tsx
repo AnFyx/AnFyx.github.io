@@ -22,7 +22,7 @@ export default async function UserProfilePage(props: Props) {
     return redirect('/settings');
   }
   const { username } = await props.params;
-  const sessionEmail = await getSessionEmail() || '';
+  const sessionEmail = (await getSessionEmail()) || '';
   const profile = await prisma.profile.findFirstOrThrow({
     where:{username:username}
   });

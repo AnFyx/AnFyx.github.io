@@ -20,7 +20,6 @@ export default function SwipeablePost({
     onSwipedLeft: async () => await deletePost(post.id),
     onSwipedRight: async () => {
       await approvePost(post.id);
-      redirect('/');
     },
     preventScrollOnSwipe: true,
   });

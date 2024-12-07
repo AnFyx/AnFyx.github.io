@@ -41,7 +41,7 @@ export async function getSessionEmailOrThrow(): Promise<string> {
 export async function getSessionRole(): Promise<string> {
   const userEmail = await getSessionEmail();
   if (userEmail) {
-    const profile = await prisma.profile.findUnique({
+    const profile = await prisma.profile.findFirst({
       where: {
         email: userEmail,
       },
@@ -70,6 +70,9 @@ export async function updateProfile(data: FormData, role: string) {
   }
   let nameText = data.get('name') as string;
   if (leoProfanity.check(nameText)) {
+    nameText = usernameText;
+  }
+  if (nameText === "undefined") {
     nameText = usernameText;
   }
   let subtitleText = data.get('subtitle') as string;
@@ -130,7 +133,7 @@ export async function approvePost(postId: string) {
   const post = await prisma.postForApproval.findFirstOrThrow({
     where: { id: postId },
   });
-  deleteApprovedPost(postId);
+  await deletePost(postId);
   const postDoc = await prisma.post.create({
     data: {
       author: post.author,

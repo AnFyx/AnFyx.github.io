@@ -15,7 +15,7 @@ export default async function UserProfilePage(props: Props) {
   if (!session) {
     return redirect('/login');
   }
-  const profileExists = await prisma.profile.findUnique({
+  const profileExists = await prisma.profile.findFirst({
     where: {email: session?.user?.email as string},
   });
   if (profileExists?.username === undefined) {
